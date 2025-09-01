@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">چشم‌انداز آب و هوا</string>
+    <string name="wind_speed_unit">km/h</string>
+    <string name="uv_unit">شاخص</string>
+    <string name="humidity_unit">درصد</string>
+    <string name="feels_like_temperature_in_celsius">"احساس واقعی: %1$s°C "</string>
+    <string name="temperature_value_in_celsius">%1$s°</string>
+    <string name="humidity_label">رطوبت</string>
+    <string name="wind_speed_label">سرعت باد</string>
+    <string name="uv_index_label">uv</string>
+    <string name="icon_image_url">https:%1$s</string>
+    <string name="today">امروز</string>
+    <string name="forecast">پیش‌بینی</string>
+    <string name="search_icon">جستجو</string>
+    <string name="search_hint">جستجوی یک شهر</string>
+    <string name="close_icon">بستن جستجو</string>
+    <string name="retry">تلاش مجدد</string>
+</resources>
