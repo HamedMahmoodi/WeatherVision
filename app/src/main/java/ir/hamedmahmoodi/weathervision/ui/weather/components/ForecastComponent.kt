@@ -3,13 +3,19 @@ package ir.hamedmahmoodi.weathervision.ui.weather.components
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -29,14 +35,13 @@ import ir.hamedmahmoodi.weathervision.utils.DateUtil.toFormattedDay
 
 @Composable
 fun ForecastComponent(
-    modifier: Modifier = Modifier,
     date: String,
     icon: String,
     minTemp: String,
     maxTemp: String,
 ) {
     ElevatedCard(
-        modifier = modifier.padding(end = 16.dp),
+        modifier = Modifier.padding(end = 16.dp),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
@@ -61,16 +66,36 @@ fun ForecastComponent(
                 error = painterResource(id = R.drawable.ic_placeholder),
                 placeholder = painterResource(id = R.drawable.ic_placeholder),
             )
-            Text(
-                text = maxTemp,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
-            )
-            Spacer(Modifier.width(4.dp))
-
-            Text(
-                text = minTemp, style = MaterialTheme.typography.bodySmall
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = maxTemp,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+                Icon(
+                    Icons.Default.KeyboardArrowUp,
+                    contentDescription = "ArrowUp",
+                    Modifier.size(15.dp)
+                )
+            }
+            Spacer(Modifier.height(4.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = minTemp, style = MaterialTheme.typography.bodySmall
+                )
+                Spacer(Modifier.width(3.dp))
+                Icon(
+                    Icons.Default.KeyboardArrowDown,
+                    contentDescription = "ArrowDown",
+                    Modifier.size(10.dp)
+                )
+            }
         }
     }
 }

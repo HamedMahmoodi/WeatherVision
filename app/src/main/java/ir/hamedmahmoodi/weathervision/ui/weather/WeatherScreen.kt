@@ -70,7 +70,6 @@ import kotlin.random.Random
 
 @Composable
 fun WeatherScreen(
-    modifier: Modifier = Modifier,
     viewModel: WeatherViewModel = hiltViewModel(),
 ) {
     val searchWidgetState by viewModel.searchWidgetState
@@ -97,7 +96,7 @@ fun WeatherScreen(
                     .padding(paddingValues),
                 color = MaterialTheme.colorScheme.background
             ) {
-                WeatherScreenContent(uiState = uiState, modifier = modifier, viewModel = viewModel)
+                WeatherScreenContent(uiState = uiState, viewModel = viewModel)
             }
         },
     )
@@ -106,7 +105,6 @@ fun WeatherScreen(
 @Composable
 fun WeatherScreenContent(
     uiState: WeatherUiState,
-    modifier: Modifier = Modifier,
     viewModel: WeatherViewModel?,
 ) {
     when {
@@ -119,14 +117,13 @@ fun WeatherScreenContent(
         }
 
         else -> {
-            WeatherSuccessState(modifier = modifier, uiState = uiState)
+            WeatherSuccessState(uiState = uiState)
         }
     }
 }
 
 @Composable
 private fun WeatherErrorState(
-    modifier: Modifier = Modifier,
     uiState: WeatherUiState,
     viewModel: WeatherViewModel?,
 ) {
@@ -139,7 +136,7 @@ private fun WeatherErrorState(
         Animation(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(8f),
+                .weight(2f),
             animation = R.raw.animation_error,
         )
 
@@ -157,11 +154,11 @@ private fun WeatherErrorState(
         }
 
         Text(
-            modifier = modifier
+            modifier = Modifier
                 .weight(2f)
                 .alpha(0.5f)
                 .padding(horizontal = 16.dp, vertical = 16.dp),
-            text = "Something went wrong: ${uiState.errorMessage}",
+            text = stringResource(R.string.something_went_wrong, uiState.errorMessage),
             textAlign = TextAlign.Center,
         )
     }
@@ -169,11 +166,10 @@ private fun WeatherErrorState(
 
 @Composable
 private fun WeatherSuccessState(
-    modifier: Modifier,
     uiState: WeatherUiState,
 ) {
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -196,8 +192,8 @@ private fun WeatherSuccessState(
             ),
             contentScale = ContentScale.FillBounds,
             contentDescription = null,
-            error = painterResource(id = R.drawable.ic_placeholder),
-            placeholder = painterResource(id = R.drawable.ic_placeholder),
+            error = painterResource(R.drawable.ic_placeholder),
+            placeholder = painterResource(R.drawable.ic_placeholder),
         )
         Text(
             text = stringResource(
@@ -228,14 +224,14 @@ private fun WeatherSuccessState(
             Image(painter = painterResource(id = R.drawable.ic_sunrise), contentDescription = null)
             Text(
                 modifier = Modifier.padding(start = 4.dp),
-                text = uiState.weather?.forecasts?.get(0)?.sunrise?.lowercase(Locale.US).orEmpty(),
+                text = uiState.weather?.forecasts?.firstOrNull()?.sunrise?.lowercase(Locale.US).orEmpty(),
                 style = MaterialTheme.typography.bodySmall,
             )
             Spacer(modifier = Modifier.width(16.dp))
             Image(painter = painterResource(id = R.drawable.ic_sunset), contentDescription = null)
             Text(
                 modifier = Modifier.padding(start = 4.dp),
-                text = uiState.weather?.forecasts?.get(0)?.sunset?.lowercase(Locale.US).orEmpty(),
+                text = uiState.weather?.forecasts?.firstOrNull()?.sunset?.lowercase(Locale.US).orEmpty(),
                 style = MaterialTheme.typography.bodySmall,
             )
         }
@@ -273,7 +269,7 @@ private fun WeatherSuccessState(
         Text(
             text = stringResource(R.string.today),
             style = MaterialTheme.typography.bodyMedium,
-            modifier = modifier
+            modifier = Modifier
                 .align(Alignment.Start)
                 .padding(horizontal = 16.dp),
         )
@@ -296,10 +292,11 @@ private fun WeatherSuccessState(
         }
 
         Spacer(Modifier.height(16.dp))
+
         Text(
             text = stringResource(R.string.forecast),
             style = MaterialTheme.typography.bodyMedium,
-            modifier = modifier
+            modifier = Modifier
                 .align(Alignment.Start)
                 .padding(horizontal = 16.dp),
         )

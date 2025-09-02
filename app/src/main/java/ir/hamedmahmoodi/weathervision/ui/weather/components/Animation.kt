@@ -19,7 +19,7 @@ fun Animation(modifier: Modifier = Modifier, animation: Int) {
         composition = composition,
         iterations = LottieConstants.IterateForever,
         isPlaying = true,
-        speed = 2f,
+        speed = 1f,
     )
 
     LottieAnimation(

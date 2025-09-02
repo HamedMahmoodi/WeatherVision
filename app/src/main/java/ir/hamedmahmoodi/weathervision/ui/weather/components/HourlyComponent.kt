@@ -19,19 +19,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import ir.hamedmahmoodi.weathervision.R
 import ir.hamedmahmoodi.weathervision.ui.theme.WeatherTheme
 
 @Composable
 fun HourlyComponent(
-    modifier: Modifier = Modifier,
     time: String,
     icon: String,
     temperature: String,
 ) {
     ElevatedCard(
-        modifier = modifier.padding(end = 12.dp),
+        modifier = Modifier.padding(end = 12.dp),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
@@ -44,8 +44,9 @@ fun HourlyComponent(
             verticalArrangement = Arrangement.Center,
         ) {
             Text(
-                text = time.substring(11, 13),
+                text = time.substring(11, 13) + ":00",
                 style = MaterialTheme.typography.titleMedium,
+                fontSize = 14.sp
             )
             AsyncImage(
                 modifier = Modifier.size(42.dp),

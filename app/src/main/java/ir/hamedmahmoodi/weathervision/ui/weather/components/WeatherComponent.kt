@@ -46,7 +46,7 @@ fun WeatherComponent(
                 style = MaterialTheme.typography.bodySmall,
             )
             Image(
-                painter = painterResource(id = iconId),
+                painter = painterResource(iconId),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
             )
