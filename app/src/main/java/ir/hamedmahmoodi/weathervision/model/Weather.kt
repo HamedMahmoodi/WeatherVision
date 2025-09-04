@@ -9,6 +9,7 @@ data class Weather(
     val humidity: Int,
     val feelsLike: Int,
     val condition: Condition,
+    val isDay:Int,
     val uv: Int,
     val name: String,
     val forecasts: List<Forecast>

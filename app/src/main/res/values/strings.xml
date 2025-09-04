@@ -15,5 +15,7 @@
     <string name="search_hint">Search for a city</string>
     <string name="close_icon">Close Icon</string>
     <string name="retry">Retry</string>
+    <string name="backgroundImage">backgroundImage</string>
     <string name="something_went_wrong">Something went wrong: %1$s</string>
+    <string name="error_network">Please check your network connection and try again!</string>
 </resources>

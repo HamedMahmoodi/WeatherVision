@@ -2,8 +2,10 @@ package ir.hamedmahmoodi.weathervision.ui.weather
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -165,164 +167,223 @@ private fun WeatherErrorState(
 }
 
 @Composable
-private fun WeatherSuccessState(
-    uiState: WeatherUiState,
-) {
-    Column(
+private fun WeatherSuccessState(uiState: WeatherUiState) {
+    val backgroundImage = backgroundImageForCondition(
+        condition = uiState.weather?.condition,
+        isDay = uiState.weather?.isDay == 1
+    )
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            modifier = Modifier.padding(top = 12.dp),
-            text = uiState.weather?.name.orEmpty(),
-            style = MaterialTheme.typography.headlineMedium
-        )
-        Text(
-            text = uiState.weather?.date?.toFormattedDate().orEmpty(),
-            style = MaterialTheme.typography.bodyLarge
-        )
-
-        AsyncImage(
-            modifier = Modifier.size(64.dp),
-            model = stringResource(
-                R.string.icon_image_url,
-                uiState.weather?.condition?.icon.orEmpty(),
-            ),
-            contentScale = ContentScale.FillBounds,
+        Image(
+            painter = painterResource(id = backgroundImage),
             contentDescription = null,
-            error = painterResource(R.drawable.ic_placeholder),
-            placeholder = painterResource(R.drawable.ic_placeholder),
-        )
-        Text(
-            text = stringResource(
-                R.string.temperature_value_in_celsius,
-                uiState.weather?.temperature.toString()
-            ),
-            style = MaterialTheme.typography.headlineLarge,
-            fontWeight = FontWeight.Bold,
-        )
-        Text(
-            modifier = Modifier.padding(start = 12.dp, end = 12.dp),
-            text = uiState.weather?.condition?.text.orEmpty(),
-            style = MaterialTheme.typography.bodyMedium,
-        )
-        Text(
-            modifier = Modifier.padding(bottom = 4.dp),
-            text = stringResource(
-                R.string.feels_like_temperature_in_celsius,
-                uiState.weather?.feelsLike.toString()
-            ),
-            style = MaterialTheme.typography.bodySmall
-        )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Image(painter = painterResource(id = R.drawable.ic_sunrise), contentDescription = null)
-            Text(
-                modifier = Modifier.padding(start = 4.dp),
-                text = uiState.weather?.forecasts?.firstOrNull()?.sunrise?.lowercase(Locale.US).orEmpty(),
-                style = MaterialTheme.typography.bodySmall,
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Image(painter = painterResource(id = R.drawable.ic_sunset), contentDescription = null)
-            Text(
-                modifier = Modifier.padding(start = 4.dp),
-                text = uiState.weather?.forecasts?.firstOrNull()?.sunset?.lowercase(Locale.US).orEmpty(),
-                style = MaterialTheme.typography.bodySmall,
-            )
-        }
-        Spacer(Modifier.height(16.dp))
-
-        Row(
+            contentScale = ContentScale.FillBounds,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp),
-        ) {
-            WeatherComponent(
-                modifier = Modifier.weight(1f),
-                weatherLabel = stringResource(R.string.wind_speed_label),
-                weatherValue = uiState.weather?.wind.toString(),
-                weatherUnit = stringResource(R.string.wind_speed_unit),
-                iconId = R.drawable.ic_wind,
-            )
-            WeatherComponent(
-                modifier = Modifier.weight(1f),
-                weatherLabel = stringResource(R.string.uv_index_label),
-                weatherValue = uiState.weather?.uv.toString(),
-                weatherUnit = stringResource(R.string.uv_unit),
-                iconId = R.drawable.ic_uv,
-            )
-            WeatherComponent(
-                modifier = Modifier.weight(1f),
-                weatherLabel = stringResource(R.string.humidity_label),
-                weatherValue = uiState.weather?.humidity.toString(),
-                weatherUnit = stringResource(R.string.humidity_unit),
-                iconId = R.drawable.ic_humidity,
-            )
-        }
-
-        Spacer(Modifier.height(16.dp))
-        Text(
-            text = stringResource(R.string.today),
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier
-                .align(Alignment.Start)
-                .padding(horizontal = 16.dp),
+                .matchParentSize()
+                .alpha(0.7f)
         )
-        LazyRow(
-            modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(top = 8.dp, start = 16.dp),
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            uiState.weather?.forecasts?.get(0)?.let { forecast ->
-                items(forecast.hour) { hour ->
-                    HourlyComponent(
-                        time = hour.time,
-                        icon = hour.icon,
-                        temperature = stringResource(
-                            R.string.temperature_value_in_celsius,
-                            hour.temperature,
+            Text(
+                modifier = Modifier.padding(top = 12.dp),
+                text = uiState.weather?.name.orEmpty(),
+                style = MaterialTheme.typography.headlineMedium,
+            )
+            Text(
+                text = uiState.weather?.date?.toFormattedDate().orEmpty(),
+                style = MaterialTheme.typography.bodyLarge
+            )
+
+            AsyncImage(
+                modifier = Modifier.size(64.dp),
+                model = stringResource(
+                    R.string.icon_image_url,
+                    uiState.weather?.condition?.icon.orEmpty(),
+                ),
+                contentScale = ContentScale.FillBounds,
+                contentDescription = null,
+                error = painterResource(R.drawable.ic_placeholder),
+                placeholder = painterResource(R.drawable.ic_placeholder),
+            )
+            Text(
+                text = stringResource(
+                    R.string.temperature_value_in_celsius,
+                    uiState.weather?.temperature.toString()
+                ),
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                modifier = Modifier.padding(start = 12.dp, end = 12.dp),
+                text = uiState.weather?.condition?.text.orEmpty(),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            Text(
+                modifier = Modifier.padding(bottom = 4.dp),
+                text = stringResource(
+                    R.string.feels_like_temperature_in_celsius,
+                    uiState.weather?.feelsLike.toString()
+                ),
+                style = MaterialTheme.typography.bodySmall
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_sunrise),
+                    contentDescription = null
+                )
+                Text(
+                    modifier = Modifier.padding(start = 4.dp),
+                    text = uiState.weather?.forecasts?.firstOrNull()?.sunrise?.lowercase(Locale.US)
+                        .orEmpty(),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Image(
+                    painter = painterResource(id = R.drawable.ic_sunset),
+                    contentDescription = null
+                )
+                Text(
+                    modifier = Modifier.padding(start = 4.dp),
+                    text = uiState.weather?.forecasts?.firstOrNull()?.sunset?.lowercase(Locale.US)
+                        .orEmpty(),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+            Spacer(Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp),
+            ) {
+                WeatherComponent(
+                    modifier = Modifier.weight(1f),
+                    weatherLabel = stringResource(R.string.wind_speed_label),
+                    weatherValue = uiState.weather?.wind.toString(),
+                    weatherUnit = stringResource(R.string.wind_speed_unit),
+                    iconId = R.drawable.ic_wind,
+                )
+                WeatherComponent(
+                    modifier = Modifier.weight(1f),
+                    weatherLabel = stringResource(R.string.uv_index_label),
+                    weatherValue = uiState.weather?.uv.toString(),
+                    weatherUnit = stringResource(R.string.uv_unit),
+                    iconId = R.drawable.ic_uv,
+                )
+                WeatherComponent(
+                    modifier = Modifier.weight(1f),
+                    weatherLabel = stringResource(R.string.humidity_label),
+                    weatherValue = uiState.weather?.humidity.toString(),
+                    weatherUnit = stringResource(R.string.humidity_unit),
+                    iconId = R.drawable.ic_humidity,
+                )
+            }
+
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = stringResource(R.string.today),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .padding(horizontal = 16.dp),
+            )
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(top = 8.dp, start = 16.dp),
+            ) {
+                uiState.weather?.forecasts?.get(0)?.let { forecast ->
+                    items(forecast.hour) { hour ->
+                        HourlyComponent(
+                            time = hour.time,
+                            icon = hour.icon,
+                            temperature = stringResource(
+                                R.string.temperature_value_in_celsius,
+                                hour.temperature,
+                            )
                         )
-                    )
+                    }
                 }
             }
-        }
 
-        Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
-        Text(
-            text = stringResource(R.string.forecast),
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier
-                .align(Alignment.Start)
-                .padding(horizontal = 16.dp),
-        )
+            Text(
+                text = stringResource(R.string.forecast),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .padding(horizontal = 16.dp),
+            )
 
-        LazyRow(
-            modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(top = 8.dp, start = 16.dp),
-        ) {
-            uiState.weather?.let { weather ->
-                items(weather.forecasts) { forecast ->
-                    ForecastComponent(
-                        date = forecast.date,
-                        icon = forecast.icon,
-                        minTemp = stringResource(
-                            R.string.temperature_value_in_celsius,
-                            forecast.minTemp
-                        ),
-                        maxTemp = stringResource(
-                            R.string.temperature_value_in_celsius,
-                            forecast.maxTemp,
-                        ),
-                    )
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(top = 8.dp, start = 16.dp),
+            ) {
+                uiState.weather?.let { weather ->
+                    items(weather.forecasts) { forecast ->
+                        ForecastComponent(
+                            date = forecast.date,
+                            icon = forecast.icon,
+                            minTemp = stringResource(
+                                R.string.temperature_value_in_celsius,
+                                forecast.minTemp
+                            ),
+                            maxTemp = stringResource(
+                                R.string.temperature_value_in_celsius,
+                                forecast.maxTemp,
+                            ),
+                        )
+                    }
                 }
             }
+            Spacer(Modifier.height(16.dp))
         }
-        Spacer(Modifier.height(16.dp))
+    }
+}
+
+@DrawableRes
+private fun backgroundImageForCondition(condition: Condition?, isDay: Boolean): Int {
+    if (condition == null) {
+        return if (isDay) R.drawable.bg_sunny else R.drawable.bg_clear
+    }
+    val code = condition.code
+    return when (code) {
+
+        //کمی ابری
+        1003 -> if (isDay) R.drawable.bg_little_cloudy_day else R.drawable.bg_little_cloudy_night
+
+        //ابری
+        1006, 1009 -> if (isDay) R.drawable.bg_cloudy_day else R.drawable.bg_cloudy_night
+
+        //مه - دود
+        1030, 1135, 1147 -> if (isDay) R.drawable.bg_fog_day else R.drawable.bg_fog_night
+
+        // باران
+        1063, 1150, 1153, 1180, 1183, 1186, 1189 -> if (isDay) R.drawable.bg_rain_day else R.drawable.bg_rain_night
+
+        // باران شدید
+        1192, 1195, 1240, 1243, 1246 -> if (isDay) R.drawable.bg_rain_heavy_day else R.drawable.bg_rain_heavy_night
+
+        // باران یخ زده
+        1069, 1072, 1168, 1171, 1204, 1207, 1249, 1252 -> if (isDay) R.drawable.bg_sleet_day else R.drawable.bg_sleet_night
+
+        // برف
+        1066, 1114, 1117, 1210, 1213, 1216, 1219, 1222, 1225, 1237, 1255, 1258, 1261, 1264 -> if (isDay) R.drawable.bg_snow_day else R.drawable.bg_snow_night
+
+        // رعد و برق - طوفان
+        1087, 1273, 1276, 1279, 1282 -> if (isDay) R.drawable.bg_thunder_day else R.drawable.bg_thunder_night
+        //صاف - تمیز
+        else -> if (isDay) R.drawable.bg_sunny else R.drawable.bg_clear
     }
 }
 
@@ -372,6 +433,7 @@ fun WeatherScreenContentPreview() {
                         humidity = 35,
                         feelsLike = 18,
                         condition = Condition(10, "", "Cloudy"),
+                        isDay = 1,
                         uv = 2,
                         name = "Munich",
                         forecasts = forecasts,
@@ -389,7 +451,7 @@ fun WeatherTopAppBar(
     onTextChange: (String) -> Unit,
     onCloseClicked: () -> Unit,
     onSearchClicked: (String) -> Unit,
-    onSearchTriggered: () -> Unit
+    onSearchTriggered: () -> Unit,
 ) {
     when (searchWidgetState) {
         SearchWidgetState.CLOSED -> {

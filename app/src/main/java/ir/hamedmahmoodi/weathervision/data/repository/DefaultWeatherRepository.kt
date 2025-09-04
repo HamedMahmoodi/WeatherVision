@@ -1,5 +1,6 @@
 package ir.hamedmahmoodi.weathervision.data.repository
 
+import ir.hamedmahmoodi.weathervision.R
 import ir.hamedmahmoodi.weathervision.data.model.toWeather
 import ir.hamedmahmoodi.weathervision.data.network.WeatherApi
 import ir.hamedmahmoodi.weathervision.model.Weather
@@ -25,7 +26,7 @@ class DefaultWeatherRepository @Inject constructor(
         } catch (exception: HttpException) {
             emit(Result.Error(exception.message.orEmpty()))
         } catch (exception: IOException) {
-            emit(Result.Error("Please check your network connection and try again!"))
+            emit(Result.Error(R.string.error_network.toString()))
         }
     }.flowOn(dispatcher)
 }
