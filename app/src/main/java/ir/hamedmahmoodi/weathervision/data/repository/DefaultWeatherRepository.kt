@@ -1,5 +1,6 @@
 package ir.hamedmahmoodi.weathervision.data.repository
 
+import com.google.gson.JsonSyntaxException
 import ir.hamedmahmoodi.weathervision.R
 import ir.hamedmahmoodi.weathervision.data.model.toWeather
 import ir.hamedmahmoodi.weathervision.data.network.WeatherApi
@@ -23,10 +24,24 @@ class DefaultWeatherRepository @Inject constructor(
         try {
             val result = weatherApi.getWeatherForecast(city = city).toWeather()
             emit(Result.Success(result))
-        } catch (exception: HttpException) {
-            emit(Result.Error(exception.message.orEmpty()))
-        } catch (exception: IOException) {
-            emit(Result.Error(R.string.error_network.toString()))
+        } catch (exception: Exception) {
+            when (exception) {
+                is HttpException -> {
+                    emit(Result.Error(exception.message.orEmpty()))
+                }
+
+                is IOException -> {
+                    emit(Result.Error(R.string.error_network.toString()))
+                }
+
+                is JsonSyntaxException -> {
+                    emit(Result.Error(R.string.something_went_wrong.toString()))
+                }
+
+                else -> {
+                    emit(Result.Error(R.string.unknown_error.toString()))
+                }
+            }
         }
     }.flowOn(dispatcher)
 }

@@ -18,5 +18,6 @@
     <string name="retry">تلاش مجدد</string>
     <string name="backgroundImage">backgroundImage</string>
     <string name="something_went_wrong">خطایی رخ داد: %1$s</string>
+    <string name="unknown_error">خطایی رخ داد: %1$s</string>
     <string name="error_network">اتصال اینترنت را بررسی کرده و مجدد تلاش کنید!</string>
 </resources>
