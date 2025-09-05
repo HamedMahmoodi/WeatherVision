@@ -19,4 +19,5 @@
     <string name="something_went_wrong">Something went wrong: %1$s</string>
     <string name="unknown_error">Unknown error: %1$s</string>
     <string name="error_network">Please check your network connection and try again!</string>
+    <string name="close_menu">close menu</string>
 </resources>

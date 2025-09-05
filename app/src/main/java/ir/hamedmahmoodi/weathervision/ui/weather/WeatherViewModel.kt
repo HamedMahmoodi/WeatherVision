@@ -9,11 +9,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import ir.hamedmahmoodi.weathervision.data.repository.WeatherRepository
 import ir.hamedmahmoodi.weathervision.utils.DEFAULT_WEATHER_DESTINATION
 import ir.hamedmahmoodi.weathervision.utils.Result
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,6 +41,21 @@ class WeatherViewModel @Inject constructor(
 
     fun updateSearchTextState(newValue: String) {
         _searchTextState.value = newValue
+    }
+
+    private val _uiEvent = MutableSharedFlow<WeatherUiEvent>()
+    val uiEvent  = _uiEvent.asSharedFlow()
+
+    fun onMenuClicked(){
+        viewModelScope.launch {
+           _uiEvent.emit(WeatherUiEvent.OpenDrawer)
+        }
+    }
+
+    fun onCloseDrawer(){
+        viewModelScope.launch {
+            _uiEvent.emit(WeatherUiEvent.CloseDrawer)
+        }
     }
 
     init {

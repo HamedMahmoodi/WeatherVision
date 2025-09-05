@@ -3,13 +3,21 @@ package ir.hamedmahmoodi.weathervision.ui.weather
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,29 +27,39 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -67,6 +85,7 @@ import ir.hamedmahmoodi.weathervision.ui.weather.components.ForecastComponent
 import ir.hamedmahmoodi.weathervision.ui.weather.components.HourlyComponent
 import ir.hamedmahmoodi.weathervision.ui.weather.components.WeatherComponent
 import ir.hamedmahmoodi.weathervision.utils.DateUtil.toFormattedDate
+import kotlinx.coroutines.launch
 import java.util.Locale
 import kotlin.random.Random
 
@@ -77,31 +96,54 @@ fun WeatherScreen(
     val searchWidgetState by viewModel.searchWidgetState
     val searchTextState by viewModel.searchTextState
     val uiState: WeatherUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
-    Scaffold(
-        topBar = {
-            WeatherTopAppBar(
-                searchWidgetState = searchWidgetState,
-                searchTextState = searchTextState,
-                onTextChange = { viewModel.updateSearchTextState(it) },
-                onCloseClicked = { viewModel.updateSearchWidgetState(SearchWidgetState.CLOSED) },
-                onSearchClicked = { viewModel.getWeather(it) },
-                onSearchTriggered = {
-                    viewModel.updateSearchWidgetState(newValue = SearchWidgetState.OPENED)
+    LaunchedEffect(key1 = true) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is WeatherUiEvent.OpenDrawer -> {
+                    scope.launch { drawerState.open() }
                 }
-            )
-        },
-        content = { paddingValues ->
-            Surface(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                color = MaterialTheme.colorScheme.background
-            ) {
-                WeatherScreenContent(uiState = uiState, viewModel = viewModel)
+
+                is WeatherUiEvent.CloseDrawer -> {
+                    scope.launch { drawerState.close() }
+                }
             }
-        },
-    )
+        }
+    }
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = { WeatherDrawerContent(onCloseDrawer = { viewModel.onCloseDrawer() }) }
+    ) {
+        Scaffold(
+            topBar = {
+                WeatherTopAppBar(
+                    searchWidgetState = searchWidgetState,
+                    searchTextState = searchTextState,
+                    onTextChange = { viewModel.updateSearchTextState(it) },
+                    onCloseClicked = { viewModel.updateSearchWidgetState(SearchWidgetState.CLOSED) },
+                    onSearchClicked = { viewModel.getWeather(it) },
+                    onSearchTriggered = {
+                        viewModel.updateSearchWidgetState(newValue = SearchWidgetState.OPENED)
+                    },
+                    onMenuClick = { scope.launch { viewModel.onMenuClicked() } }
+                )
+            },
+            content = { paddingValues ->
+                Surface(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    WeatherScreenContent(uiState = uiState, viewModel = viewModel)
+                }
+            },
+        )
+    }
+
 }
 
 @Composable
@@ -182,7 +224,7 @@ private fun WeatherSuccessState(uiState: WeatherUiState) {
             contentScale = ContentScale.FillBounds,
             modifier = Modifier
                 .matchParentSize()
-                .alpha(0.7f)
+                .alpha(0.8f)
         )
         Column(
             modifier = Modifier
@@ -452,11 +494,13 @@ fun WeatherTopAppBar(
     onCloseClicked: () -> Unit,
     onSearchClicked: (String) -> Unit,
     onSearchTriggered: () -> Unit,
+    onMenuClick: () -> Unit,
 ) {
     when (searchWidgetState) {
         SearchWidgetState.CLOSED -> {
             DefaultAppBar(
-                onSearchClicked = onSearchTriggered
+                onSearchClicked = onSearchTriggered,
+                onMenuClick = onMenuClick
             )
         }
 
@@ -473,13 +517,24 @@ fun WeatherTopAppBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DefaultAppBar(onSearchClicked: () -> Unit) {
+fun DefaultAppBar(
+    onSearchClicked: () -> Unit,
+    onMenuClick: () -> Unit,
+) {
     TopAppBar(
         title = {
             Text(
                 text = stringResource(id = R.string.app_name),
                 fontWeight = FontWeight.Bold,
             )
+        },
+        navigationIcon = {
+            IconButton(onClick = onMenuClick) {
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "Menu"
+                )
+            }
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -566,11 +621,52 @@ fun SearchAppBar(
     }
 }
 
+@Composable
+fun WeatherDrawerContent(onCloseDrawer: () -> Unit) {
+    Card(
+        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        modifier = Modifier
+            .fillMaxHeight()
+            .fillMaxWidth(0.7f)
+            .padding(5.dp)
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = { })
+            }
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+
+            IconButton(
+                onClick = onCloseDrawer,
+                modifier = Modifier.align(Alignment.TopEnd)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = stringResource(R.string.close_menu)
+                )
+            }
+            this@Card.AnimatedVisibility(
+                visible = true,
+                enter = fadeIn(animationSpec = tween(500)) + slideInHorizontally(initialOffsetX = { -it }),
+                exit = fadeOut(animationSpec = tween(300)) + slideOutHorizontally(targetOffsetX = { -it })
+            ) {
+                Text(
+                    text = "منوی خالی",
+                    modifier = Modifier.align(Alignment.Center),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+
+        }
+    }
+}
 
 @Composable
 @Preview
 fun DefaultAppBarPreview() {
-    DefaultAppBar(onSearchClicked = {})
+    DefaultAppBar(onSearchClicked = {}, onMenuClick = {})
 }
 
 @Composable
