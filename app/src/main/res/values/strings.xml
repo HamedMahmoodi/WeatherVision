@@ -20,4 +20,8 @@
     <string name="unknown_error">Unknown error: %1$s</string>
     <string name="error_network">Please check your network connection and try again!</string>
     <string name="close_menu">close menu</string>
+    <string name="language_selection">Select Language:</string>
+    <string name="lang_system">Use system</string>
+    <string name="lang_persian">Persian</string>
+    <string name="lang_english">English</string>
 </resources>

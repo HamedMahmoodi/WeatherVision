@@ -21,4 +21,8 @@
     <string name="unknown_error">خطایی رخ داد: %1$s</string>
     <string name="error_network">اتصال اینترنت را بررسی کرده و مجدد تلاش کنید!</string>
     <string name="close_menu">بستن منو</string>
+    <string name="language_selection">انتخاب زبان:</string>
+    <string name="lang_system">براساس سیستم</string>
+    <string name="lang_persian">فارسی</string>
+    <string name="lang_english">انگلیسی</string>
 </resources>

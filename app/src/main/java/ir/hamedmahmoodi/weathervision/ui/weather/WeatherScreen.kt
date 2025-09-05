@@ -10,6 +10,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,6 +46,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -115,7 +117,18 @@ fun WeatherScreen(
 
     ModalNavigationDrawer(
         drawerState = drawerState,
-        drawerContent = { WeatherDrawerContent(onCloseDrawer = { viewModel.onCloseDrawer() }) }
+        drawerContent =
+        {
+            WeatherDrawerContent(
+                onCloseDrawer = { viewModel.onCloseDrawer() },
+                selectedLanguage = viewModel.selectedLanguage.value,
+                onLanguageSelected = { option ->
+                   viewModel.updateLanguage(option)
+                    scope.launch { drawerState.close() }
+                },
+                isVisible = drawerState.isOpen
+            )
+        }
     ) {
         Scaffold(
             topBar = {
@@ -622,7 +635,12 @@ fun SearchAppBar(
 }
 
 @Composable
-fun WeatherDrawerContent(onCloseDrawer: () -> Unit) {
+fun WeatherDrawerContent(
+    onCloseDrawer: () -> Unit,
+    selectedLanguage: LanguageOption,
+    onLanguageSelected: (LanguageOption) -> Unit,
+    isVisible: Boolean,
+) {
     Card(
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
@@ -648,15 +666,43 @@ fun WeatherDrawerContent(onCloseDrawer: () -> Unit) {
                 )
             }
             this@Card.AnimatedVisibility(
-                visible = true,
+                visible = isVisible,
                 enter = fadeIn(animationSpec = tween(500)) + slideInHorizontally(initialOffsetX = { -it }),
                 exit = fadeOut(animationSpec = tween(300)) + slideOutHorizontally(targetOffsetX = { -it })
-            ) {
-                Text(
-                    text = "منوی خالی",
-                    modifier = Modifier.align(Alignment.Center),
-                    style = MaterialTheme.typography.bodyLarge
-                )
+            ){
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 48.dp, start = 16.dp, end = 16.dp)
+                ) {
+
+                    Text(
+                        text = stringResource(R.string.language_selection),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    Spacer(modifier = Modifier.height(5.dp))
+
+                    LanguageOption.entries.forEach { option ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onLanguageSelected(option) }
+
+                        ) {
+                            RadioButton(
+                                selected = (selectedLanguage == option),
+                                onClick = { onLanguageSelected(option) },
+                                modifier = Modifier.size(35.dp)
+                            )
+                            Text(
+                                text = stringResource(option.labelRes),
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    }
+                }
             }
 
         }

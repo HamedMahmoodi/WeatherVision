@@ -1,0 +1,10 @@
+package ir.hamedmahmoodi.weathervision.ui.weather
+
+import androidx.annotation.StringRes
+import ir.hamedmahmoodi.weathervision.R
+
+enum class LanguageOption(@StringRes val labelRes: Int) {
+    SYSTEM(R.string.lang_system),
+    PERSIAN(R.string.lang_persian),
+    ENGLISH(R.string.lang_english)
+}

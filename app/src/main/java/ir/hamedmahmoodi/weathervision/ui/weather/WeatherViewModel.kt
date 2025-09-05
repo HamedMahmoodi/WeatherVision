@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ir.hamedmahmoodi.weathervision.data.repository.WeatherRepository
+import ir.hamedmahmoodi.weathervision.utils.AppLocaleUtil
 import ir.hamedmahmoodi.weathervision.utils.DEFAULT_WEATHER_DESTINATION
 import ir.hamedmahmoodi.weathervision.utils.Result
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -56,6 +57,14 @@ class WeatherViewModel @Inject constructor(
         viewModelScope.launch {
             _uiEvent.emit(WeatherUiEvent.CloseDrawer)
         }
+    }
+
+    private val _selectedLanguage = mutableStateOf(AppLocaleUtil.get())
+    val selectedLanguage: State<LanguageOption> = _selectedLanguage
+
+    fun updateLanguage(option: LanguageOption) {
+        _selectedLanguage.value = option
+        AppLocaleUtil.set(option)
     }
 
     init {
