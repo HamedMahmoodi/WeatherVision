@@ -24,4 +24,8 @@
     <string name="lang_system">Use system</string>
     <string name="lang_persian">Persian</string>
     <string name="lang_english">English</string>
+    <string name="theme_selection">Select Theme:</string>
+    <string name="theme_system">Use system</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
 </resources>

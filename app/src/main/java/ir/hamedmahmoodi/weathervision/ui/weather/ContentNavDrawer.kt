@@ -8,3 +8,9 @@ enum class LanguageOption(@StringRes val labelRes: Int) {
     PERSIAN(R.string.lang_persian),
     ENGLISH(R.string.lang_english)
 }
+
+enum class ThemeOption(@StringRes val labelRes: Int){
+    SYSTEM(R.string.theme_system),
+    LIGHT(R.string.theme_light),
+    DARK(R.string.theme_dark)
+}

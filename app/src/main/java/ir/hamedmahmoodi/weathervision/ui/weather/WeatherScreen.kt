@@ -4,12 +4,19 @@ import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -40,8 +47,10 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -61,6 +70,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -70,6 +82,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Devices.PIXEL_XL
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -121,12 +134,16 @@ fun WeatherScreen(
         {
             WeatherDrawerContent(
                 onCloseDrawer = { viewModel.onCloseDrawer() },
+                isVisible = drawerState.isOpen,
                 selectedLanguage = viewModel.selectedLanguage.value,
                 onLanguageSelected = { option ->
-                   viewModel.updateLanguage(option)
+                    viewModel.updateLanguage(option)
                     scope.launch { drawerState.close() }
                 },
-                isVisible = drawerState.isOpen
+                selectedTheme = viewModel.selectedTheme.value,
+                onThemeSelected = {option ->
+                    viewModel.updateTheme(option)
+                }
             )
         }
     ) {
@@ -567,6 +584,12 @@ fun DefaultAppBar(
 }
 
 @Composable
+@Preview
+fun DefaultAppBarPreview() {
+    DefaultAppBar(onSearchClicked = {}, onMenuClick = {})
+}
+
+@Composable
 fun SearchAppBar(
     text: String,
     onTextChange: (String) -> Unit,
@@ -635,14 +658,28 @@ fun SearchAppBar(
 }
 
 @Composable
+@Preview
+fun SearchAppBarPreview() {
+    SearchAppBar(
+        text = "Search for a city",
+        onTextChange = {},
+        onCloseClicked = {},
+        onSearchClicked = {}
+    )
+}
+
+@Composable
 fun WeatherDrawerContent(
     onCloseDrawer: () -> Unit,
+    isVisible: Boolean,
     selectedLanguage: LanguageOption,
     onLanguageSelected: (LanguageOption) -> Unit,
-    isVisible: Boolean,
+    selectedTheme: ThemeOption,
+    onThemeSelected: (ThemeOption) -> Unit,
 ) {
     Card(
         shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         modifier = Modifier
             .fillMaxHeight()
@@ -665,11 +702,12 @@ fun WeatherDrawerContent(
                     contentDescription = stringResource(R.string.close_menu)
                 )
             }
+
             this@Card.AnimatedVisibility(
                 visible = isVisible,
-                enter = fadeIn(animationSpec = tween(500)) + slideInHorizontally(initialOffsetX = { -it }),
-                exit = fadeOut(animationSpec = tween(300)) + slideOutHorizontally(targetOffsetX = { -it })
-            ){
+                enter = fadeIn(animationSpec = tween(700)) + slideInHorizontally(initialOffsetX = { -it }),
+                exit = fadeOut(animationSpec = tween(500)) + slideOutHorizontally(targetOffsetX = { -it })
+            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -684,24 +722,51 @@ fun WeatherDrawerContent(
                     Spacer(modifier = Modifier.height(5.dp))
 
                     LanguageOption.entries.forEach { option ->
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onLanguageSelected(option) }
-
-                        ) {
-                            RadioButton(
-                                selected = (selectedLanguage == option),
-                                onClick = { onLanguageSelected(option) },
-                                modifier = Modifier.size(35.dp)
-                            )
-                            Text(
-                                text = stringResource(option.labelRes),
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        }
+                        SelectableOptionRow(
+                            text = stringResource(option.labelRes),
+                            selected = (selectedLanguage == option),
+                            onClick = { onLanguageSelected(option) },
+                            leading = {
+                                RadioButton(
+                                    selected = (selectedLanguage == option),
+                                    onClick = { onLanguageSelected(option) },
+                                    modifier = Modifier.size(35.dp)
+                                )
+                            }
+                        )
                     }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                        thickness = 1.dp
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = stringResource(R.string.theme_selection),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    Spacer(modifier = Modifier.height(5.dp))
+
+                    ThemeOption.entries.forEach { option ->
+                        SelectableOptionRow(
+                            text = stringResource(option.labelRes),
+                            selected = (selectedTheme == option),
+                            onClick = { onThemeSelected(option) },
+                            leading = {
+                                RadioButton(
+                                    selected = (selectedTheme == option),
+                                    onClick = { onThemeSelected(option) },
+                                    modifier = Modifier.size(35.dp)
+                                )
+                            }
+                        )
+                    }
+
                 }
             }
 
@@ -710,18 +775,90 @@ fun WeatherDrawerContent(
 }
 
 @Composable
-@Preview
-fun DefaultAppBarPreview() {
-    DefaultAppBar(onSearchClicked = {}, onMenuClick = {})
+@Preview(
+    showBackground = true,
+    showSystemUi = true,
+    device = Devices.PIXEL_7_PRO
+)
+fun WeatherDrawerContentPreview(){
+    WeatherDrawerContent(
+        onCloseDrawer = {},
+    isVisible = true,
+    selectedLanguage = LanguageOption.SYSTEM,
+    onLanguageSelected = {},
+    selectedTheme = ThemeOption.SYSTEM,
+    onThemeSelected = {}
+    )
 }
 
 @Composable
-@Preview
-fun SearchAppBarPreview() {
-    SearchAppBar(
-        text = "Search for a city",
-        onTextChange = {},
-        onCloseClicked = {},
-        onSearchClicked = {}
+private fun SelectableOptionRow(
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    leading: (@Composable () -> Unit)? = null,
+) {
+    val targetBg = if (selected)
+        MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+    else
+        Color.Transparent
+    val bgColor by animateColorAsState(
+        targetValue = targetBg,
+        animationSpec = tween(durationMillis = 220, easing = FastOutSlowInEasing),
+        label = "bgAnim"
     )
+
+    val scale by animateFloatAsState(
+        targetValue = if (selected) 1.05f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "scaleAnim"
+    )
+
+    val tonalElevation by animateDpAsState(
+        targetValue = if (selected) 5.dp else 0.dp,
+        animationSpec = tween(180),
+        label = "elevAnim"
+    )
+
+    Surface(
+        tonalElevation = tonalElevation,
+        shape = RoundedCornerShape(10.dp),
+        color = bgColor,
+        modifier = Modifier
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
+            .clip(RoundedCornerShape(10.dp))
+            .clickable(onClick = onClick)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 3.dp)
+        ) {
+            if (leading != null) {
+                leading()
+            }
+            val textColor = if (selected) {
+                MaterialTheme.colorScheme.onPrimaryContainer
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            }
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    color = textColor,
+                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+                )
+            )
+        }
+    }
 }
+
+
+

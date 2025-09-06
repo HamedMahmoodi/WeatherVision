@@ -25,4 +25,8 @@
     <string name="lang_system">براساس سیستم</string>
     <string name="lang_persian">فارسی</string>
     <string name="lang_english">انگلیسی</string>
+    <string name="theme_selection">انتخاب تم:</string>
+    <string name="theme_system">براساس سیستم</string>
+    <string name="theme_light">روشن</string>
+    <string name="theme_dark">تاریک</string>
 </resources>

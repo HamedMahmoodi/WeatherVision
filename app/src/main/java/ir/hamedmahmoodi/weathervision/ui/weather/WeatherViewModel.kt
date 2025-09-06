@@ -1,5 +1,6 @@
 package ir.hamedmahmoodi.weathervision.ui.weather
 
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -65,6 +66,18 @@ class WeatherViewModel @Inject constructor(
     fun updateLanguage(option: LanguageOption) {
         _selectedLanguage.value = option
         AppLocaleUtil.set(option)
+    }
+
+    private val _selectedTheme = mutableStateOf(ThemeOption.SYSTEM)
+    val selectedTheme :State<ThemeOption> = _selectedTheme
+
+    fun updateTheme(option: ThemeOption){
+        _selectedTheme.value = option
+        when (option) {
+            ThemeOption.SYSTEM -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            ThemeOption.LIGHT  -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            ThemeOption.DARK   -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        }
     }
 
     init {
