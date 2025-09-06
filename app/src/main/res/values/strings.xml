@@ -3,8 +3,7 @@
     <string name="wind_speed_unit">km/h</string>
     <string name="uv_unit">index</string>
     <string name="humidity_unit">percentage %</string>
-    <string name="feels_like_temperature_in_celsius">Feels like: %1$s°C</string>
-    <string name="temperature_value_in_celsius">%1$s°</string>
+    <string name="feels_like_temperature">Feels like: %1$s</string>
     <string name="humidity_label">humidity</string>
     <string name="wind_speed_label">wind speed</string>
     <string name="uv_index_label">uv</string>
@@ -28,4 +27,7 @@
     <string name="theme_system">Use system</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
+    <string name="temperature_selection">Select Temperature Unit:</string>
+    <string name="unit_celsius">°C</string>
+    <string name="unit_fahrenheit">°F</string>
 </resources>

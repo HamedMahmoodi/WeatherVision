@@ -4,8 +4,7 @@
     <string name="wind_speed_unit">کیلومتر/ساعت</string>
     <string name="uv_unit">شاخص</string>
     <string name="humidity_unit">درصد</string>
-    <string name="feels_like_temperature_in_celsius">"احساس واقعی: %1$s°C "</string>
-    <string name="temperature_value_in_celsius">%1$s°</string>
+    <string name="feels_like_temperature">"احساس واقعی: %1$s"</string>
     <string name="humidity_label">رطوبت</string>
     <string name="wind_speed_label">سرعت باد</string>
     <string name="uv_index_label">فرابنفش</string>
@@ -29,4 +28,7 @@
     <string name="theme_system">براساس سیستم</string>
     <string name="theme_light">روشن</string>
     <string name="theme_dark">تاریک</string>
+    <string name="temperature_selection">انتخاب واحد دما:</string>
+    <string name="unit_celsius">°C</string>
+    <string name="unit_fahrenheit">°F</string>
 </resources>

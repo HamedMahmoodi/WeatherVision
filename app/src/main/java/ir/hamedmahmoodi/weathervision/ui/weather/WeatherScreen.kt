@@ -16,7 +16,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -47,7 +46,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -100,6 +98,7 @@ import ir.hamedmahmoodi.weathervision.ui.weather.components.ForecastComponent
 import ir.hamedmahmoodi.weathervision.ui.weather.components.HourlyComponent
 import ir.hamedmahmoodi.weathervision.ui.weather.components.WeatherComponent
 import ir.hamedmahmoodi.weathervision.utils.DateUtil.toFormattedDate
+import ir.hamedmahmoodi.weathervision.utils.TemperatureUnitUtil
 import kotlinx.coroutines.launch
 import java.util.Locale
 import kotlin.random.Random
@@ -113,6 +112,7 @@ fun WeatherScreen(
     val uiState: WeatherUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val selectUnit by viewModel.selectTemperatureUnit
 
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect { event ->
@@ -136,14 +136,11 @@ fun WeatherScreen(
                 onCloseDrawer = { viewModel.onCloseDrawer() },
                 isVisible = drawerState.isOpen,
                 selectedLanguage = viewModel.selectedLanguage.value,
-                onLanguageSelected = { option ->
-                    viewModel.updateLanguage(option)
-                    scope.launch { drawerState.close() }
-                },
+                onLanguageSelected = { viewModel.updateLanguage(it) },
                 selectedTheme = viewModel.selectedTheme.value,
-                onThemeSelected = {option ->
-                    viewModel.updateTheme(option)
-                }
+                onThemeSelected = { viewModel.updateTheme(it) },
+                selectedTemperatureUnit = selectUnit,
+                onTemperatureUnit = { viewModel.updateTemperatureUnit(it) }
             )
         }
     ) {
@@ -168,7 +165,7 @@ fun WeatherScreen(
                         .padding(paddingValues),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    WeatherScreenContent(uiState = uiState, viewModel = viewModel)
+                    WeatherScreenContent(uiState = uiState, viewModel = viewModel,selectedUnit = selectUnit)
                 }
             },
         )
@@ -180,6 +177,7 @@ fun WeatherScreen(
 fun WeatherScreenContent(
     uiState: WeatherUiState,
     viewModel: WeatherViewModel?,
+    selectedUnit: TemperatureUnit,
 ) {
     when {
         uiState.isLoading -> {
@@ -191,7 +189,10 @@ fun WeatherScreenContent(
         }
 
         else -> {
-            WeatherSuccessState(uiState = uiState)
+            WeatherSuccessState(
+                uiState = uiState,
+                selectedTemperatureUnit = selectedUnit
+            )
         }
     }
 }
@@ -239,7 +240,10 @@ private fun WeatherErrorState(
 }
 
 @Composable
-private fun WeatherSuccessState(uiState: WeatherUiState) {
+private fun WeatherSuccessState(
+    uiState: WeatherUiState,
+    selectedTemperatureUnit: TemperatureUnit
+) {
     val backgroundImage = backgroundImageForCondition(
         condition = uiState.weather?.condition,
         isDay = uiState.weather?.isDay == 1
@@ -284,10 +288,9 @@ private fun WeatherSuccessState(uiState: WeatherUiState) {
                 placeholder = painterResource(R.drawable.ic_placeholder),
             )
             Text(
-                text = stringResource(
-                    R.string.temperature_value_in_celsius,
-                    uiState.weather?.temperature.toString()
-                ),
+                text = uiState.weather?.temperature?.let { temp ->
+                    TemperatureUnitUtil.formatTemperature(temp.toDouble(), selectedTemperatureUnit)
+                }.orEmpty(),
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
             )
@@ -298,10 +301,12 @@ private fun WeatherSuccessState(uiState: WeatherUiState) {
             )
             Text(
                 modifier = Modifier.padding(bottom = 4.dp),
-                text = stringResource(
-                    R.string.feels_like_temperature_in_celsius,
-                    uiState.weather?.feelsLike.toString()
-                ),
+                text = uiState.weather?.temperature?.let { temp ->
+                    stringResource(
+                        id = R.string.feels_like_temperature,
+                        TemperatureUnitUtil.formatTemperature(temp.toDouble(), selectedTemperatureUnit)
+                    )
+                }.orEmpty(),
                 style = MaterialTheme.typography.bodySmall
             )
             Row(
@@ -378,10 +383,7 @@ private fun WeatherSuccessState(uiState: WeatherUiState) {
                         HourlyComponent(
                             time = hour.time,
                             icon = hour.icon,
-                            temperature = stringResource(
-                                R.string.temperature_value_in_celsius,
-                                hour.temperature,
-                            )
+                            temperature = TemperatureUnitUtil.formatTemperature(hour.temperature.toDouble())
                         )
                     }
                 }
@@ -406,14 +408,8 @@ private fun WeatherSuccessState(uiState: WeatherUiState) {
                         ForecastComponent(
                             date = forecast.date,
                             icon = forecast.icon,
-                            minTemp = stringResource(
-                                R.string.temperature_value_in_celsius,
-                                forecast.minTemp
-                            ),
-                            maxTemp = stringResource(
-                                R.string.temperature_value_in_celsius,
-                                forecast.maxTemp,
-                            ),
+                            minTemp = TemperatureUnitUtil.formatTemperature(forecast.minTemp.toDouble()),
+                            maxTemp = TemperatureUnitUtil.formatTemperature(forecast.maxTemp.toDouble())
                         )
                     }
                 }
@@ -510,7 +506,9 @@ fun WeatherScreenContentPreview() {
                         name = "Munich",
                         forecasts = forecasts,
                     ),
-                ), viewModel = null
+                ),
+                viewModel = null,
+                selectedUnit = TemperatureUnit.CELSIUS
             )
         }
     }
@@ -676,6 +674,8 @@ fun WeatherDrawerContent(
     onLanguageSelected: (LanguageOption) -> Unit,
     selectedTheme: ThemeOption,
     onThemeSelected: (ThemeOption) -> Unit,
+    selectedTemperatureUnit: TemperatureUnit,
+    onTemperatureUnit: (TemperatureUnit) -> Unit,
 ) {
     Card(
         shape = RoundedCornerShape(8.dp),
@@ -721,15 +721,15 @@ fun WeatherDrawerContent(
 
                     Spacer(modifier = Modifier.height(5.dp))
 
-                    LanguageOption.entries.forEach { option ->
+                    LanguageOption.entries.forEach {
                         SelectableOptionRow(
-                            text = stringResource(option.labelRes),
-                            selected = (selectedLanguage == option),
-                            onClick = { onLanguageSelected(option) },
+                            text = stringResource(it.labelRes),
+                            selected = (selectedLanguage == it),
+                            onClick = { onLanguageSelected(it) },
                             leading = {
                                 RadioButton(
-                                    selected = (selectedLanguage == option),
-                                    onClick = { onLanguageSelected(option) },
+                                    selected = (selectedLanguage == it),
+                                    onClick = { onLanguageSelected(it) },
                                     modifier = Modifier.size(35.dp)
                                 )
                             }
@@ -752,15 +752,46 @@ fun WeatherDrawerContent(
 
                     Spacer(modifier = Modifier.height(5.dp))
 
-                    ThemeOption.entries.forEach { option ->
+                    ThemeOption.entries.forEach {
                         SelectableOptionRow(
-                            text = stringResource(option.labelRes),
-                            selected = (selectedTheme == option),
-                            onClick = { onThemeSelected(option) },
+                            text = stringResource(it.labelRes),
+                            selected = (selectedTheme == it),
+                            onClick = { onThemeSelected(it) },
                             leading = {
                                 RadioButton(
-                                    selected = (selectedTheme == option),
-                                    onClick = { onThemeSelected(option) },
+                                    selected = (selectedTheme == it),
+                                    onClick = { onThemeSelected(it) },
+                                    modifier = Modifier.size(35.dp)
+                                )
+                            }
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                        thickness = 1.dp
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = stringResource(R.string.temperature_selection),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    Spacer(modifier = Modifier.height(5.dp))
+
+                    TemperatureUnit.entries.forEach {
+                        SelectableOptionRow(
+                            text = stringResource(it.labelRes),
+                            selected = (selectedTemperatureUnit == it),
+                            onClick = { onTemperatureUnit(it) },
+                            leading = {
+                                RadioButton(
+                                    selected = (selectedTemperatureUnit == it),
+                                    onClick = { onTemperatureUnit(it) },
                                     modifier = Modifier.size(35.dp)
                                 )
                             }
@@ -780,14 +811,16 @@ fun WeatherDrawerContent(
     showSystemUi = true,
     device = Devices.PIXEL_7_PRO
 )
-fun WeatherDrawerContentPreview(){
+fun WeatherDrawerContentPreview() {
     WeatherDrawerContent(
         onCloseDrawer = {},
-    isVisible = true,
-    selectedLanguage = LanguageOption.SYSTEM,
-    onLanguageSelected = {},
-    selectedTheme = ThemeOption.SYSTEM,
-    onThemeSelected = {}
+        isVisible = true,
+        selectedLanguage = LanguageOption.SYSTEM,
+        onLanguageSelected = {},
+        selectedTheme = ThemeOption.SYSTEM,
+        onThemeSelected = {},
+        selectedTemperatureUnit = TemperatureUnit.CELSIUS,
+        onTemperatureUnit = {}
     )
 }
 

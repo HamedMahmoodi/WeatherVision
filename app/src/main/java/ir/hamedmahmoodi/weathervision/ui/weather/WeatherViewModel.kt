@@ -11,6 +11,7 @@ import ir.hamedmahmoodi.weathervision.data.repository.WeatherRepository
 import ir.hamedmahmoodi.weathervision.utils.AppLocaleUtil
 import ir.hamedmahmoodi.weathervision.utils.DEFAULT_WEATHER_DESTINATION
 import ir.hamedmahmoodi.weathervision.utils.Result
+import ir.hamedmahmoodi.weathervision.utils.TemperatureUnitUtil
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -46,15 +47,15 @@ class WeatherViewModel @Inject constructor(
     }
 
     private val _uiEvent = MutableSharedFlow<WeatherUiEvent>()
-    val uiEvent  = _uiEvent.asSharedFlow()
+    val uiEvent = _uiEvent.asSharedFlow()
 
-    fun onMenuClicked(){
+    fun onMenuClicked() {
         viewModelScope.launch {
-           _uiEvent.emit(WeatherUiEvent.OpenDrawer)
+            _uiEvent.emit(WeatherUiEvent.OpenDrawer)
         }
     }
 
-    fun onCloseDrawer(){
+    fun onCloseDrawer() {
         viewModelScope.launch {
             _uiEvent.emit(WeatherUiEvent.CloseDrawer)
         }
@@ -69,15 +70,23 @@ class WeatherViewModel @Inject constructor(
     }
 
     private val _selectedTheme = mutableStateOf(ThemeOption.SYSTEM)
-    val selectedTheme :State<ThemeOption> = _selectedTheme
+    val selectedTheme: State<ThemeOption> = _selectedTheme
 
-    fun updateTheme(option: ThemeOption){
+    fun updateTheme(option: ThemeOption) {
         _selectedTheme.value = option
         when (option) {
             ThemeOption.SYSTEM -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-            ThemeOption.LIGHT  -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            ThemeOption.DARK   -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            ThemeOption.LIGHT -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            ThemeOption.DARK -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         }
+    }
+
+    private val _selectedTemperatureUnit = mutableStateOf(TemperatureUnit.CELSIUS)
+    val selectTemperatureUnit: State<TemperatureUnit> = _selectedTemperatureUnit
+
+    fun updateTemperatureUnit(option: TemperatureUnit) {
+        _selectedTemperatureUnit.value = option
+        TemperatureUnitUtil.set(option)
     }
 
     init {
