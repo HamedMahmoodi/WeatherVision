@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ir.hamedmahmoodi.weathervision.data.repository.WeatherRepository
 import ir.hamedmahmoodi.weathervision.utils.AppLocaleUtil
+import ir.hamedmahmoodi.weathervision.utils.CityLookupUtil
 import ir.hamedmahmoodi.weathervision.utils.DEFAULT_WEATHER_DESTINATION
 import ir.hamedmahmoodi.weathervision.utils.Result
 import ir.hamedmahmoodi.weathervision.utils.TemperatureUnitUtil
@@ -94,7 +95,8 @@ class WeatherViewModel @Inject constructor(
     }
 
     fun getWeather(city: String = DEFAULT_WEATHER_DESTINATION) {
-        repository.getWeatherForecast(city).map { result ->
+        val englishCity = CityLookupUtil.findEnglish(city)?:city
+        repository.getWeatherForecast(englishCity).map { result ->
             when (result) {
                 is Result.Success -> {
                     _uiState.value = WeatherUiState(weather = result.data)

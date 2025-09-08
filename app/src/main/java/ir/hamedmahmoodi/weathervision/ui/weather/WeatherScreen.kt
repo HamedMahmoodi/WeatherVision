@@ -73,6 +73,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -97,6 +98,7 @@ import ir.hamedmahmoodi.weathervision.ui.weather.components.Animation
 import ir.hamedmahmoodi.weathervision.ui.weather.components.ForecastComponent
 import ir.hamedmahmoodi.weathervision.ui.weather.components.HourlyComponent
 import ir.hamedmahmoodi.weathervision.ui.weather.components.WeatherComponent
+import ir.hamedmahmoodi.weathervision.utils.CityLookupUtil
 import ir.hamedmahmoodi.weathervision.utils.DateUtil.toFormattedDate
 import ir.hamedmahmoodi.weathervision.utils.TemperatureUnitUtil
 import kotlinx.coroutines.launch
@@ -113,6 +115,11 @@ fun WeatherScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val selectUnit by viewModel.selectTemperatureUnit
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        CityLookupUtil.loadCities(context)
+    }
 
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect { event ->
