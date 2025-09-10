@@ -14,8 +14,8 @@ object TemperatureUnitUtil {
 
     fun formatTemperature(tempCelsius: Double, unit: TemperatureUnit = currentUnit): String {
         return when (unit) {
-            TemperatureUnit.CELSIUS -> "${tempCelsius.toInt()}°C"
-            TemperatureUnit.FAHRENHEIT -> "${celsiusToFahrenheit(tempCelsius).toInt()}°F"
+            TemperatureUnit.CELSIUS -> "${tempCelsius.toInt()}"
+            TemperatureUnit.FAHRENHEIT -> "${celsiusToFahrenheit(tempCelsius).toInt()}"
         }
     }
 

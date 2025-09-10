@@ -86,6 +86,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Devices.PIXEL_XL
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
@@ -260,16 +261,14 @@ private fun WeatherErrorState(
 private fun WeatherSuccessState(
     uiState: WeatherUiState,
     selectedTemperatureUnit: TemperatureUnit,
-    selectedDateType: DateType
+    selectedDateType: DateType,
 ) {
     val backgroundImage = backgroundImageForCondition(
         condition = uiState.weather?.condition,
         isDay = uiState.weather?.isDay == 1
     )
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
+
         Image(
             painter = painterResource(id = backgroundImage),
             contentDescription = null,
@@ -278,60 +277,99 @@ private fun WeatherSuccessState(
                 .matchParentSize()
                 .alpha(0.8f)
         )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+
             Text(
                 modifier = Modifier.padding(top = 12.dp),
                 text = uiState.weather?.name.orEmpty(),
                 style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold
             )
+
             Text(
                 text = uiState.weather?.date
                     ?.formatFullDate(selectedDateType)
                     .orEmpty(),
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyMedium
             )
 
-            AsyncImage(
-                modifier = Modifier.size(64.dp),
-                model = stringResource(
-                    R.string.icon_image_url,
-                    uiState.weather?.condition?.icon.orEmpty(),
-                ),
-                contentScale = ContentScale.FillBounds,
-                contentDescription = null,
-                error = painterResource(R.drawable.ic_placeholder),
-                placeholder = painterResource(R.drawable.ic_placeholder),
-            )
-            Text(
-                text = uiState.weather?.temperature?.let { temp ->
-                    TemperatureUnitUtil.formatTemperature(temp.toDouble(), selectedTemperatureUnit)
-                }.orEmpty(),
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                modifier = Modifier.padding(start = 12.dp, end = 12.dp),
-                text = uiState.weather?.condition?.text.orEmpty(),
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            Text(
-                modifier = Modifier.padding(bottom = 4.dp),
-                text = uiState.weather?.temperature?.let { temp ->
-                    stringResource(
-                        id = R.string.feels_like_temperature,
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                AsyncImage(
+                    modifier = Modifier.size(120.dp),
+                    model = stringResource(
+                        R.string.icon_image_url,
+                        uiState.weather?.condition?.icon.orEmpty(),
+                    ),
+                    contentScale = ContentScale.FillBounds,
+                    contentDescription = null,
+                    error = painterResource(R.drawable.ic_placeholder),
+                    placeholder = painterResource(R.drawable.ic_placeholder),
+                )
+                Text(
+                    text = uiState.weather?.temperature?.let { temp ->
                         TemperatureUnitUtil.formatTemperature(
                             temp.toDouble(),
                             selectedTemperatureUnit
                         )
-                    )
-                }.orEmpty(),
-                style = MaterialTheme.typography.bodySmall
-            )
+                    }.orEmpty(),
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 50.sp
+                )
+                Text(
+                    text = if (TemperatureUnit.CELSIUS.toString() == selectedTemperatureUnit.toString()) {
+                        stringResource(R.string.unit_celsius)
+                    } else {
+                        stringResource(R.string.unit_fahrenheit)
+                    },
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    modifier = Modifier.padding(start = 16.dp),
+                    text = uiState.weather?.condition?.text.orEmpty(),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    modifier = Modifier.padding(bottom = 4.dp),
+                    text = uiState.weather?.temperature?.let { temp ->
+                        stringResource(
+                            id = R.string.feels_like_temperature,
+                            TemperatureUnitUtil.formatTemperature(
+                                temp.toDouble(),
+                                selectedTemperatureUnit
+                            )
+                        )
+                    }.orEmpty(),
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    modifier = Modifier.padding(bottom = 4.dp),
+                    text = when (selectedTemperatureUnit) {
+                        TemperatureUnit.CELSIUS -> stringResource(R.string.unit_celsius)
+                        TemperatureUnit.FAHRENHEIT -> stringResource(R.string.unit_fahrenheit)
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
@@ -359,34 +397,66 @@ private fun WeatherSuccessState(
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
+
             Spacer(Modifier.height(16.dp))
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp),
+            Column(
+                modifier = Modifier.padding(start = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                WeatherComponent(
-                    modifier = Modifier.weight(1f),
-                    weatherLabel = stringResource(R.string.wind_speed_label),
-                    weatherValue = uiState.weather?.wind.toString(),
-                    weatherUnit = stringResource(R.string.wind_speed_unit),
-                    iconId = R.drawable.ic_wind,
-                )
-                WeatherComponent(
-                    modifier = Modifier.weight(1f),
-                    weatherLabel = stringResource(R.string.uv_index_label),
-                    weatherValue = uiState.weather?.uv.toString(),
-                    weatherUnit = stringResource(R.string.uv_unit),
-                    iconId = R.drawable.ic_uv,
-                )
-                WeatherComponent(
-                    modifier = Modifier.weight(1f),
-                    weatherLabel = stringResource(R.string.humidity_label),
-                    weatherValue = uiState.weather?.humidity.toString(),
-                    weatherUnit = stringResource(R.string.humidity_unit),
-                    iconId = R.drawable.ic_humidity,
-                )
+
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    WeatherComponent(
+                        modifier = Modifier.weight(1f),
+                        weatherLabel = stringResource(R.string.feels_like),
+                        weatherValue = uiState.weather?.feelsLike.toString(),
+                        weatherUnit = when (selectedTemperatureUnit) {
+                            TemperatureUnit.CELSIUS -> stringResource(R.string.unit_celsius)
+                            TemperatureUnit.FAHRENHEIT -> stringResource(R.string.unit_fahrenheit)
+                        },
+                        iconId = R.drawable.ic_wind,
+                    )
+                    WeatherComponent(
+                        modifier = Modifier.weight(1f),
+                        weatherLabel = stringResource(R.string.wind_speed_label),
+                        weatherValue = uiState.weather?.wind.toString(),
+                        weatherUnit = stringResource(R.string.wind_speed_unit),
+                        iconId = R.drawable.ic_wind,
+                    )
+                    WeatherComponent(
+                        modifier = Modifier.weight(1f),
+                        weatherLabel = stringResource(R.string.wind_speed_label),
+                        weatherValue = uiState.weather?.wind.toString(),
+                        weatherUnit = stringResource(R.string.wind_speed_unit),
+                        iconId = R.drawable.ic_wind,
+                    )
+                }
+
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    WeatherComponent(
+                        modifier = Modifier.weight(1f),
+                        weatherLabel = stringResource(R.string.wind_speed_label),
+                        weatherValue = uiState.weather?.wind.toString(),
+                        weatherUnit = stringResource(R.string.wind_speed_unit),
+                        iconId = R.drawable.ic_wind,
+                    )
+                    WeatherComponent(
+                        modifier = Modifier.weight(1f),
+                        weatherLabel = stringResource(R.string.uv_index_label),
+                        weatherValue = uiState.weather?.uv.toString(),
+                        weatherUnit = "",
+                        iconId = R.drawable.ic_uv,
+                    )
+                    WeatherComponent(
+                        modifier = Modifier.weight(1f),
+                        weatherLabel = stringResource(R.string.humidity_label),
+                        weatherValue = uiState.weather?.humidity.toString(),
+                        weatherUnit = stringResource(R.string.humidity_unit),
+                        iconId = R.drawable.ic_humidity,
+                    )
+                }
+
             }
 
             Spacer(Modifier.height(16.dp))
@@ -406,7 +476,8 @@ private fun WeatherSuccessState(
                         HourlyComponent(
                             time = hour.time,
                             icon = hour.icon,
-                            temperature = TemperatureUnitUtil.formatTemperature(hour.temperature.toDouble())
+                            temperature = TemperatureUnitUtil.formatTemperature(hour.temperature.toDouble()),
+                            selectedUnit = selectedTemperatureUnit
                         )
                     }
                 }
@@ -433,7 +504,8 @@ private fun WeatherSuccessState(
                             date = forecast.date.formatDate(selectedDateType),
                             icon = forecast.icon,
                             minTemp = TemperatureUnitUtil.formatTemperature(forecast.minTemp.toDouble()),
-                            maxTemp = TemperatureUnitUtil.formatTemperature(forecast.maxTemp.toDouble())
+                            maxTemp = TemperatureUnitUtil.formatTemperature(forecast.maxTemp.toDouble()),
+                            selectedUnit = selectedTemperatureUnit
                         )
                     }
                 }

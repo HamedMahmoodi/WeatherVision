@@ -3,6 +3,7 @@ package ir.hamedmahmoodi.weathervision.ui.weather.components
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -23,12 +24,14 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import ir.hamedmahmoodi.weathervision.R
 import ir.hamedmahmoodi.weathervision.ui.theme.WeatherTheme
+import ir.hamedmahmoodi.weathervision.ui.weather.TemperatureUnit
 
 @Composable
 fun HourlyComponent(
     time: String,
     icon: String,
     temperature: String,
+    selectedUnit: TemperatureUnit
 ) {
     ElevatedCard(
         modifier = Modifier.padding(end = 12.dp),
@@ -57,10 +60,19 @@ fun HourlyComponent(
                 placeholder = painterResource(id = R.drawable.ic_placeholder),
 
                 )
-            Text(
-                text = temperature,
-                style = MaterialTheme.typography.bodyMedium,
-            )
+   Row(verticalAlignment = Alignment.CenterVertically){
+       Text(
+           text = temperature,
+           style = MaterialTheme.typography.bodyMedium,
+       )
+       Text(
+           text = when (selectedUnit) {
+               TemperatureUnit.CELSIUS -> stringResource(R.string.unit_celsius)
+               TemperatureUnit.FAHRENHEIT -> stringResource(R.string.unit_fahrenheit)
+           },
+           style = MaterialTheme.typography.bodyMedium,
+       )
+   }
         }
     }
 }
@@ -75,6 +87,7 @@ fun HourlyComponentPreview() {
                 time = "2023-10-07 13:00",
                 icon = "116.png",
                 temperature = "23",
+                selectedUnit = TemperatureUnit.CELSIUS
             )
         }
     }

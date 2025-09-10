@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ir.hamedmahmoodi.weathervision.R
 import ir.hamedmahmoodi.weathervision.ui.theme.WeatherTheme
+import ir.hamedmahmoodi.weathervision.ui.weather.TemperatureUnit
 
 @Composable
 fun ForecastComponent(
@@ -39,6 +40,7 @@ fun ForecastComponent(
     icon: String,
     minTemp: String,
     maxTemp: String,
+    selectedUnit: TemperatureUnit,
 ) {
     ElevatedCard(
         modifier = Modifier.padding(end = 16.dp),
@@ -78,7 +80,15 @@ fun ForecastComponent(
                 Text(
                     text = maxTemp,
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = when (selectedUnit) {
+                        TemperatureUnit.CELSIUS -> stringResource(R.string.unit_celsius)
+                        TemperatureUnit.FAHRENHEIT -> stringResource(R.string.unit_fahrenheit)
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
                 )
                 Icon(
                     Icons.Default.KeyboardArrowUp,
@@ -93,6 +103,13 @@ fun ForecastComponent(
             ) {
                 Text(
                     text = minTemp, style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    text = when (selectedUnit) {
+                        TemperatureUnit.CELSIUS -> stringResource(R.string.unit_celsius)
+                        TemperatureUnit.FAHRENHEIT -> stringResource(R.string.unit_fahrenheit)
+                    },
+                    style = MaterialTheme.typography.bodySmall
                 )
                 Spacer(Modifier.width(3.dp))
                 Icon(
@@ -117,6 +134,7 @@ fun ForecastComponentPreview() {
                 icon = "116.png",
                 minTemp = "12",
                 maxTemp = "28",
+                selectedUnit = TemperatureUnit.CELSIUS
             )
         }
     }

@@ -4,8 +4,12 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
@@ -41,23 +45,32 @@ fun WeatherComponent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Text(
-                text = weatherLabel,
-                style = MaterialTheme.typography.bodySmall,
-            )
             Image(
+                modifier = Modifier.size(40.dp),
                 painter = painterResource(iconId),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
             )
+            Spacer(Modifier.height(6.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(3.dp)
+            ) {
+                Text(
+                    text = weatherValue,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                Text(
+                    text = weatherUnit,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+            Spacer(Modifier.height(6.dp))
             Text(
-                text = weatherValue,
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Text(
-                text = weatherUnit,
+                text = weatherLabel,
                 style = MaterialTheme.typography.bodySmall,
             )
+
         }
     }
 }

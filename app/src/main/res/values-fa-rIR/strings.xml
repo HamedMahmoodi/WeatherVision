@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">چشم‌انداز آب و هوا</string>
-    <string name="wind_speed_unit">کیلومتر/ساعت</string>
-    <string name="uv_unit">شاخص</string>
-    <string name="humidity_unit">درصد</string>
+    <string name="wind_speed_unit">km/h</string>
+    <string name="humidity_unit">%</string>
     <string name="feels_like_temperature">"احساس واقعی: %1$s"</string>
+    <string name="feels_like">احساس واقعی</string>
     <string name="humidity_label">رطوبت</string>
     <string name="wind_speed_label">سرعت باد</string>
     <string name="uv_index_label">فرابنفش</string>
