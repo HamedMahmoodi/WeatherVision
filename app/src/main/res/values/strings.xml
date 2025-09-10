@@ -19,15 +19,18 @@
     <string name="unknown_error">Unknown error: %1$s</string>
     <string name="error_network">Please check your network connection and try again!</string>
     <string name="close_menu">close menu</string>
-    <string name="language_selection">Select Language:</string>
+    <string name="language_selection">Language:</string>
     <string name="lang_system">Use system</string>
     <string name="lang_persian">Persian</string>
     <string name="lang_english">English</string>
-    <string name="theme_selection">Select Theme:</string>
+    <string name="theme_selection">Theme:</string>
     <string name="theme_system">Use system</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
-    <string name="temperature_selection">Select Temperature Unit:</string>
+    <string name="temperature_selection">Temperature Unit:</string>
     <string name="unit_celsius">°C</string>
     <string name="unit_fahrenheit">°F</string>
+    <string name="dateType_selection">Date Type:</string>
+    <string name="type_gregorian">Gregorian</string>
+    <string name="type_jalali">Jalali</string>
 </resources>

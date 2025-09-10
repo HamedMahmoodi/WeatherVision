@@ -20,15 +20,18 @@
     <string name="unknown_error">خطایی رخ داد: %1$s</string>
     <string name="error_network">اتصال اینترنت را بررسی کرده و مجدد تلاش کنید!</string>
     <string name="close_menu">بستن منو</string>
-    <string name="language_selection">انتخاب زبان:</string>
+    <string name="language_selection">" زبان:"</string>
     <string name="lang_system">براساس سیستم</string>
     <string name="lang_persian">فارسی</string>
     <string name="lang_english">انگلیسی</string>
-    <string name="theme_selection">انتخاب تم:</string>
+    <string name="theme_selection">تم:</string>
     <string name="theme_system">براساس سیستم</string>
     <string name="theme_light">روشن</string>
     <string name="theme_dark">تاریک</string>
-    <string name="temperature_selection">انتخاب واحد دما:</string>
+    <string name="temperature_selection">" واحد دما:"</string>
     <string name="unit_celsius">°C</string>
     <string name="unit_fahrenheit">°F</string>
+    <string name="dateType_selection">" نوع تاریخ:"</string>
+    <string name="type_gregorian">میلادی</string>
+    <string name="type_jalali">شمسی</string>
 </resources>

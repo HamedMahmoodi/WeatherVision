@@ -3,6 +3,7 @@ package ir.hamedmahmoodi.weathervision.ui.weather
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -99,7 +100,9 @@ import ir.hamedmahmoodi.weathervision.ui.weather.components.ForecastComponent
 import ir.hamedmahmoodi.weathervision.ui.weather.components.HourlyComponent
 import ir.hamedmahmoodi.weathervision.ui.weather.components.WeatherComponent
 import ir.hamedmahmoodi.weathervision.utils.CityLookupUtil
-import ir.hamedmahmoodi.weathervision.utils.DateUtil.toFormattedDate
+import ir.hamedmahmoodi.weathervision.utils.DateUtil.formatDate
+import ir.hamedmahmoodi.weathervision.utils.DateUtil.formatDay
+import ir.hamedmahmoodi.weathervision.utils.DateUtil.formatFullDate
 import ir.hamedmahmoodi.weathervision.utils.TemperatureUnitUtil
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -147,7 +150,9 @@ fun WeatherScreen(
                 selectedTheme = viewModel.selectedTheme.value,
                 onThemeSelected = { viewModel.updateTheme(it) },
                 selectedTemperatureUnit = selectUnit,
-                onTemperatureUnit = { viewModel.updateTemperatureUnit(it) }
+                onTemperatureUnit = { viewModel.updateTemperatureUnit(it) },
+                selectedDateType = viewModel.selectedDateType.value,
+                onSelectedDateType = { viewModel.updateDateType(it) }
             )
         }
     ) {
@@ -172,7 +177,11 @@ fun WeatherScreen(
                         .padding(paddingValues),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    WeatherScreenContent(uiState = uiState, viewModel = viewModel,selectedUnit = selectUnit)
+                    WeatherScreenContent(
+                        uiState = uiState,
+                        viewModel = viewModel,
+                        selectedUnit = selectUnit
+                    )
                 }
             },
         )
@@ -198,7 +207,8 @@ fun WeatherScreenContent(
         else -> {
             WeatherSuccessState(
                 uiState = uiState,
-                selectedTemperatureUnit = selectedUnit
+                selectedTemperatureUnit = selectedUnit,
+                selectedDateType = viewModel?.selectedDateType?.value ?: DateType.GREGORIAN
             )
         }
     }
@@ -249,7 +259,8 @@ private fun WeatherErrorState(
 @Composable
 private fun WeatherSuccessState(
     uiState: WeatherUiState,
-    selectedTemperatureUnit: TemperatureUnit
+    selectedTemperatureUnit: TemperatureUnit,
+    selectedDateType: DateType
 ) {
     val backgroundImage = backgroundImageForCondition(
         condition = uiState.weather?.condition,
@@ -279,7 +290,9 @@ private fun WeatherSuccessState(
                 style = MaterialTheme.typography.headlineMedium,
             )
             Text(
-                text = uiState.weather?.date?.toFormattedDate().orEmpty(),
+                text = uiState.weather?.date
+                    ?.formatFullDate(selectedDateType)
+                    .orEmpty(),
                 style = MaterialTheme.typography.bodyLarge
             )
 
@@ -311,7 +324,10 @@ private fun WeatherSuccessState(
                 text = uiState.weather?.temperature?.let { temp ->
                     stringResource(
                         id = R.string.feels_like_temperature,
-                        TemperatureUnitUtil.formatTemperature(temp.toDouble(), selectedTemperatureUnit)
+                        TemperatureUnitUtil.formatTemperature(
+                            temp.toDouble(),
+                            selectedTemperatureUnit
+                        )
                     )
                 }.orEmpty(),
                 style = MaterialTheme.typography.bodySmall
@@ -413,7 +429,8 @@ private fun WeatherSuccessState(
                 uiState.weather?.let { weather ->
                     items(weather.forecasts) { forecast ->
                         ForecastComponent(
-                            date = forecast.date,
+                            day = forecast.date.formatDay(selectedDateType),
+                            date = forecast.date.formatDate(selectedDateType),
                             icon = forecast.icon,
                             minTemp = TemperatureUnitUtil.formatTemperature(forecast.minTemp.toDouble()),
                             maxTemp = TemperatureUnitUtil.formatTemperature(forecast.maxTemp.toDouble())
@@ -683,6 +700,8 @@ fun WeatherDrawerContent(
     onThemeSelected: (ThemeOption) -> Unit,
     selectedTemperatureUnit: TemperatureUnit,
     onTemperatureUnit: (TemperatureUnit) -> Unit,
+    selectedDateType: DateType,
+    onSelectedDateType: (DateType) -> Unit,
 ) {
     Card(
         shape = RoundedCornerShape(8.dp),
@@ -712,104 +731,90 @@ fun WeatherDrawerContent(
 
             this@Card.AnimatedVisibility(
                 visible = isVisible,
-                enter = fadeIn(animationSpec = tween(700)) + slideInHorizontally(initialOffsetX = { -it }),
-                exit = fadeOut(animationSpec = tween(500)) + slideOutHorizontally(targetOffsetX = { -it })
+                enter = fadeIn(animationSpec = tween(500)) + slideInHorizontally(initialOffsetX = { -it }),
+                exit = fadeOut(animationSpec = tween(300)) + slideOutHorizontally(targetOffsetX = { -it })
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(top = 48.dp, start = 16.dp, end = 16.dp)
+                        .verticalScroll(rememberScrollState())
                 ) {
 
-                    Text(
-                        text = stringResource(R.string.language_selection),
-                        style = MaterialTheme.typography.titleMedium
+                    DrawerItems(
+                        text = R.string.language_selection,
+                        options = LanguageOption.entries,
+                        selected = selectedLanguage,
+                        onSelected = onLanguageSelected,
+                        labelRes = { stringResource(it.labelRes) }
                     )
-
-                    Spacer(modifier = Modifier.height(5.dp))
-
-                    LanguageOption.entries.forEach {
-                        SelectableOptionRow(
-                            text = stringResource(it.labelRes),
-                            selected = (selectedLanguage == it),
-                            onClick = { onLanguageSelected(it) },
-                            leading = {
-                                RadioButton(
-                                    selected = (selectedLanguage == it),
-                                    onClick = { onLanguageSelected(it) },
-                                    modifier = Modifier.size(35.dp)
-                                )
-                            }
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    HorizontalDivider(
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
-                        thickness = 1.dp
+                    DrawerItems(
+                        text = R.string.theme_selection,
+                        options = ThemeOption.entries,
+                        selected = selectedTheme,
+                        onSelected = onThemeSelected,
+                        labelRes = { stringResource(it.labelRes) }
                     )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Text(
-                        text = stringResource(R.string.theme_selection),
-                        style = MaterialTheme.typography.titleMedium
+                    DrawerItems(
+                        text = R.string.temperature_selection,
+                        options = TemperatureUnit.entries,
+                        selected = selectedTemperatureUnit,
+                        onSelected = onTemperatureUnit,
+                        labelRes = { stringResource(it.labelRes) }
                     )
-
-                    Spacer(modifier = Modifier.height(5.dp))
-
-                    ThemeOption.entries.forEach {
-                        SelectableOptionRow(
-                            text = stringResource(it.labelRes),
-                            selected = (selectedTheme == it),
-                            onClick = { onThemeSelected(it) },
-                            leading = {
-                                RadioButton(
-                                    selected = (selectedTheme == it),
-                                    onClick = { onThemeSelected(it) },
-                                    modifier = Modifier.size(35.dp)
-                                )
-                            }
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    HorizontalDivider(
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
-                        thickness = 1.dp
+                    DrawerItems(
+                        text = R.string.dateType_selection,
+                        options = DateType.entries,
+                        selected = selectedDateType,
+                        onSelected = onSelectedDateType,
+                        labelRes = { stringResource(it.labelRes) }
                     )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Text(
-                        text = stringResource(R.string.temperature_selection),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-
-                    Spacer(modifier = Modifier.height(5.dp))
-
-                    TemperatureUnit.entries.forEach {
-                        SelectableOptionRow(
-                            text = stringResource(it.labelRes),
-                            selected = (selectedTemperatureUnit == it),
-                            onClick = { onTemperatureUnit(it) },
-                            leading = {
-                                RadioButton(
-                                    selected = (selectedTemperatureUnit == it),
-                                    onClick = { onTemperatureUnit(it) },
-                                    modifier = Modifier.size(35.dp)
-                                )
-                            }
-                        )
-                    }
 
                 }
             }
 
         }
     }
+}
+
+@Composable
+fun <T> DrawerItems(
+    @StringRes text: Int,
+    options: List<T>,
+    selected: T,
+    onSelected: (T) -> Unit,
+    labelRes: @Composable (T) -> String,
+) {
+    Text(
+        text = stringResource(text),
+        style = MaterialTheme.typography.titleMedium
+    )
+
+    Spacer(modifier = Modifier.height(5.dp))
+
+    options.forEach {
+        SelectableOptionRow(
+            text = labelRes(it),
+            selected = (selected == it),
+            onClick = { onSelected(it) },
+            leading = {
+                RadioButton(
+                    selected = (selected == it),
+                    onClick = { onSelected(it) },
+                    modifier = Modifier.size(35.dp)
+                )
+            }
+        )
+    }
+
+    Spacer(modifier = Modifier.height(12.dp))
+
+    HorizontalDivider(
+        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+        thickness = 1.dp
+    )
+
+    Spacer(modifier = Modifier.height(12.dp))
 }
 
 @Composable
@@ -827,7 +832,9 @@ fun WeatherDrawerContentPreview() {
         selectedTheme = ThemeOption.SYSTEM,
         onThemeSelected = {},
         selectedTemperatureUnit = TemperatureUnit.CELSIUS,
-        onTemperatureUnit = {}
+        onTemperatureUnit = {},
+        selectedDateType = DateType.GREGORIAN,
+        onSelectedDateType = {}
     )
 }
 

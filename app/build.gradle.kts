@@ -77,6 +77,8 @@ dependencies {
     implementation(libs.lottie.compose)
     implementation(libs.life.runtime.compose)
     implementation(libs.androidx.appcompat)
+    //noinspection UseTomlInstead
+    implementation("ir.huri:JalaliCalendar:1.3.3")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -31,11 +31,11 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import ir.hamedmahmoodi.weathervision.R
 import ir.hamedmahmoodi.weathervision.ui.theme.WeatherTheme
-import ir.hamedmahmoodi.weathervision.utils.DateUtil.toFormattedDay
 
 @Composable
 fun ForecastComponent(
-    date: String,
+    day: String,
+    date:String,
     icon: String,
     minTemp: String,
     maxTemp: String,
@@ -55,8 +55,13 @@ fun ForecastComponent(
         ) {
             Text(
                 modifier = Modifier.padding(start = 4.dp, end = 4.dp),
-                text = date.toFormattedDay().orEmpty(),
+                text = day,
                 style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                modifier = Modifier.padding(start = 4.dp, end = 4.dp),
+                text = date,
+                style = MaterialTheme.typography.bodySmall
             )
             AsyncImage(
                 modifier = Modifier.size(42.dp),
@@ -107,7 +112,8 @@ fun ForecastComponentPreview() {
     Surface {
         WeatherTheme {
             ForecastComponent(
-                date = "2023-10-07",
+                day = "Sunday",
+                date = "10 November",
                 icon = "116.png",
                 minTemp = "12",
                 maxTemp = "28",

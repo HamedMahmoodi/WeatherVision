@@ -90,6 +90,13 @@ class WeatherViewModel @Inject constructor(
         TemperatureUnitUtil.set(option)
     }
 
+    private val _selectedDateType = mutableStateOf(DateType.GREGORIAN)
+    val selectedDateType: State<DateType> = _selectedDateType
+
+    fun updateDateType(option: DateType) {
+        _selectedDateType.value = option
+    }
+
     init {
         getWeather()
     }

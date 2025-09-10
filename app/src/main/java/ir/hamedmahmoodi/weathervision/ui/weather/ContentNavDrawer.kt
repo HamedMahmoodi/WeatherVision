@@ -19,3 +19,8 @@ enum class TemperatureUnit(@StringRes val labelRes: Int){
     CELSIUS(R.string.unit_celsius),
     FAHRENHEIT(R.string.unit_fahrenheit)
 }
+
+enum class DateType(@StringRes val labelRes: Int) {
+    GREGORIAN(R.string.type_gregorian),
+    JALALI(R.string.type_jalali)
+}
