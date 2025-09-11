@@ -311,7 +311,7 @@ private fun WeatherSuccessState(
                         R.string.icon_image_url,
                         uiState.weather?.condition?.icon.orEmpty(),
                     ),
-                    contentScale = ContentScale.FillBounds,
+
                     contentDescription = null,
                     error = painterResource(R.drawable.ic_placeholder),
                     placeholder = painterResource(R.drawable.ic_placeholder),
@@ -341,32 +341,6 @@ private fun WeatherSuccessState(
                     text = uiState.weather?.condition?.text.orEmpty(),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
-                )
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    modifier = Modifier.padding(bottom = 4.dp),
-                    text = uiState.weather?.temperature?.let { temp ->
-                        stringResource(
-                            id = R.string.feels_like_temperature,
-                            TemperatureUnitUtil.formatTemperature(
-                                temp.toDouble(),
-                                selectedTemperatureUnit
-                            )
-                        )
-                    }.orEmpty(),
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Text(
-                    modifier = Modifier.padding(bottom = 4.dp),
-                    text = when (selectedTemperatureUnit) {
-                        TemperatureUnit.CELSIUS -> stringResource(R.string.unit_celsius)
-                        TemperatureUnit.FAHRENHEIT -> stringResource(R.string.unit_fahrenheit)
-                    },
-                    style = MaterialTheme.typography.bodySmall,
                 )
             }
 
@@ -419,16 +393,16 @@ private fun WeatherSuccessState(
                     )
                     WeatherComponent(
                         modifier = Modifier.weight(1f),
-                        weatherLabel = stringResource(R.string.wind_speed_label),
-                        weatherValue = uiState.weather?.wind.toString(),
-                        weatherUnit = stringResource(R.string.wind_speed_unit),
+                        weatherLabel = stringResource(R.string.visibility_label),
+                        weatherValue = uiState.weather?.visibility.toString(),
+                        weatherUnit = stringResource(R.string.visibility_unit),
                         iconId = R.drawable.ic_wind,
                     )
                     WeatherComponent(
                         modifier = Modifier.weight(1f),
-                        weatherLabel = stringResource(R.string.wind_speed_label),
-                        weatherValue = uiState.weather?.wind.toString(),
-                        weatherUnit = stringResource(R.string.wind_speed_unit),
+                        weatherLabel = stringResource(R.string.pressure_label),
+                        weatherValue = uiState.weather?.pressure.toString(),
+                        weatherUnit = stringResource(R.string.pressure_unit),
                         iconId = R.drawable.ic_wind,
                     )
                 }
@@ -462,7 +436,8 @@ private fun WeatherSuccessState(
             Spacer(Modifier.height(16.dp))
             Text(
                 text = stringResource(R.string.today),
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .align(Alignment.Start)
                     .padding(horizontal = 16.dp),
@@ -487,7 +462,8 @@ private fun WeatherSuccessState(
 
             Text(
                 text = stringResource(R.string.forecast),
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .align(Alignment.Start)
                     .padding(horizontal = 16.dp),
@@ -600,6 +576,8 @@ fun WeatherScreenContentPreview() {
                         isDay = 1,
                         uv = 2,
                         name = "Munich",
+                        visibility = 10,
+                        pressure = 1005,
                         forecasts = forecasts,
                     ),
                 ),

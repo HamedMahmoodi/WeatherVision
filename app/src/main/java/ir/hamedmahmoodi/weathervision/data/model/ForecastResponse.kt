@@ -159,6 +159,8 @@ fun ForecastResponse.toWeather(): Weather = Weather(
     isDay = current.isDay,
     uv = current.uv.toInt(),
     name = location.name,
+    visibility = current.visKm.toInt(),
+    pressure = current.pressureMb.toInt(),
     forecasts = forecast.forecastday.map { networkForecastday ->
         networkForecastday.toWeatherForecast()
     }

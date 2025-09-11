@@ -12,5 +12,7 @@ data class Weather(
     val isDay:Int,
     val uv: Int,
     val name: String,
+    val visibility: Int,
+    val pressure: Int,
     val forecasts: List<Forecast>
 )
