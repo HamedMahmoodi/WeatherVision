@@ -2,6 +2,7 @@ package ir.hamedmahmoodi.weathervision.data.repository
 
 import com.google.gson.JsonSyntaxException
 import ir.hamedmahmoodi.weathervision.R
+import ir.hamedmahmoodi.weathervision.data.model.SearchCityResponse
 import ir.hamedmahmoodi.weathervision.data.model.toWeather
 import ir.hamedmahmoodi.weathervision.data.network.WeatherApi
 import ir.hamedmahmoodi.weathervision.model.Weather
@@ -31,17 +32,27 @@ class DefaultWeatherRepository @Inject constructor(
                 }
 
                 is IOException -> {
-                    emit(Result.Error(R.string.error_network.toString()))
+                    emit(Result.Error("Please check your network connection and try again!"))
                 }
 
                 is JsonSyntaxException -> {
-                    emit(Result.Error(R.string.something_went_wrong.toString()))
+                    emit(Result.Error("Something went wrong"))
                 }
 
                 else -> {
-                    emit(Result.Error(R.string.unknown_error.toString()))
+                    emit(Result.Error("Unknown error"))
                 }
             }
         }
     }.flowOn(dispatcher)
+
+    override suspend fun searchCities(query: String): Result<List<SearchCityResponse>> {
+        return try {
+            val cities = weatherApi.searchCities(query = query)
+            Result.Success(cities)
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Unknown error")
+        }
+    }
+
 }

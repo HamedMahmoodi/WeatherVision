@@ -2,6 +2,7 @@ package ir.hamedmahmoodi.weathervision.data.network
 
 import ir.hamedmahmoodi.weathervision.BuildConfig
 import ir.hamedmahmoodi.weathervision.data.model.ForecastResponse
+import ir.hamedmahmoodi.weathervision.data.model.SearchCityResponse
 import ir.hamedmahmoodi.weathervision.utils.DEFAULT_WEATHER_DESTINATION
 import ir.hamedmahmoodi.weathervision.utils.NUMBER_OF_DAYS
 import retrofit2.http.Field
@@ -16,4 +17,12 @@ interface WeatherApi {
         @Field("q") city: String = DEFAULT_WEATHER_DESTINATION,
         @Field("days") days: Int = NUMBER_OF_DAYS,
     ): ForecastResponse
+
+    @FormUrlEncoded
+    @POST("search.json")
+    suspend fun searchCities(
+        @Field("key") key: String = BuildConfig.API_KEY,
+        @Field("q") query: String
+    ): List<SearchCityResponse>
+
 }

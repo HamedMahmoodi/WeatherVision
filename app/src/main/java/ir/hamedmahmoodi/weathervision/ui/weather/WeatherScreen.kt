@@ -29,9 +29,11 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -168,7 +170,8 @@ fun WeatherScreen(
                     onSearchTriggered = {
                         viewModel.updateSearchWidgetState(newValue = SearchWidgetState.OPENED)
                     },
-                    onMenuClick = { scope.launch { viewModel.onMenuClicked() } }
+                    onMenuClick = { scope.launch { viewModel.onMenuClicked() } },
+                    viewModel = viewModel
                 )
             },
             content = { paddingValues ->
@@ -613,6 +616,7 @@ fun WeatherTopAppBar(
     onSearchClicked: (String) -> Unit,
     onSearchTriggered: () -> Unit,
     onMenuClick: () -> Unit,
+    viewModel: WeatherViewModel,
 ) {
     when (searchWidgetState) {
         SearchWidgetState.CLOSED -> {
@@ -623,14 +627,42 @@ fun WeatherTopAppBar(
         }
 
         SearchWidgetState.OPENED -> {
-            SearchAppBar(
-                text = searchTextState,
-                onTextChange = onTextChange,
-                onCloseClicked = onCloseClicked,
-                onSearchClicked = onSearchClicked
-            )
+            Column {
+                SearchAppBar(
+                    text = searchTextState,
+                    onTextChange = {
+                        onTextChange(it)
+                        viewModel.searchCity(it)
+                    },
+                    onCloseClicked = onCloseClicked,
+                    onSearchClicked = onSearchClicked
+                )
+
+                val results by viewModel.searchResults.collectAsStateWithLifecycle()
+                if (results.isNotEmpty()) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 250.dp)
+                    ) {
+                        items(results) { city ->
+                            Text(
+                                text = "${city.name}, ${city.country}",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        viewModel.onCitySelected(city)
+                                    }
+                                    .padding(12.dp),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import ir.hamedmahmoodi.weathervision.data.model.SearchCityResponse
 import ir.hamedmahmoodi.weathervision.data.repository.WeatherRepository
 import ir.hamedmahmoodi.weathervision.utils.AppLocaleUtil
 import ir.hamedmahmoodi.weathervision.utils.CityLookupUtil
@@ -97,6 +98,10 @@ class WeatherViewModel @Inject constructor(
         _selectedDateType.value = option
     }
 
+    private val _searchResults = MutableStateFlow<List<SearchCityResponse>>(emptyList())
+    val searchResults = _searchResults.asStateFlow()
+
+
     init {
         getWeather()
     }
@@ -118,6 +123,27 @@ class WeatherViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)
+    }
+
+    fun searchCity(query: String) {
+        viewModelScope.launch {
+            if (query.length >= 2) {
+                when (val result = repository.searchCities(query)) {
+                    is Result.Success -> _searchResults.value = result.data
+                    is Result.Error -> _searchResults.value = emptyList()
+                    else -> {}
+                }
+            } else {
+                _searchResults.value = emptyList()
+            }
+        }
+    }
+
+    fun onCitySelected(city: SearchCityResponse) {
+        val cityName = "${city.name}, ${city.country}"
+        getWeather(cityName)
+        _searchResults.value = emptyList()
+        updateSearchTextState("")
     }
 
 }
