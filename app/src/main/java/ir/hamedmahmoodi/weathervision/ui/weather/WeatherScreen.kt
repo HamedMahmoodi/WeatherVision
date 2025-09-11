@@ -199,6 +199,7 @@ fun WeatherScreenContent(
     when {
         uiState.isLoading -> {
             Animation(modifier = Modifier.fillMaxSize(), animation = R.raw.animation_loading)
+            WeatherLoadingState()
         }
 
         uiState.errorMessage.isNotEmpty() -> {
@@ -212,6 +213,21 @@ fun WeatherScreenContent(
                 selectedDateType = viewModel?.selectedDateType?.value ?: DateType.GREGORIAN
             )
         }
+    }
+}
+
+@Composable
+private fun WeatherLoadingState() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 20.dp),
+        contentAlignment = Alignment.BottomCenter,
+    ) {
+        Text(
+            text = stringResource(R.string.text_loading),
+            style = MaterialTheme.typography.bodyMedium,
+        )
     }
 }
 

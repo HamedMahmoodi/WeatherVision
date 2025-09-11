@@ -37,4 +37,5 @@
     <string name="dateType_selection">" نوع تاریخ:"</string>
     <string name="type_gregorian">میلادی</string>
     <string name="type_jalali">شمسی</string>
+    <string name="text_loading">درحال بارگذاری داده های آب و هوا....</string>
 </resources>

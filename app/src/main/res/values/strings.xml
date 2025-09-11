@@ -36,4 +36,5 @@
     <string name="dateType_selection">Date Type:</string>
     <string name="type_gregorian">Gregorian</string>
     <string name="type_jalali">Jalali</string>
+    <string name="text_loading">Loading weather data....</string>
 </resources>
