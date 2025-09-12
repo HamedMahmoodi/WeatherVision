@@ -38,4 +38,17 @@
     <string name="type_gregorian">میلادی</string>
     <string name="type_jalali">شمسی</string>
     <string name="text_loading">درحال بارگذاری داده های آب و هوا....</string>
+    <string name="name_programmer">برنامه نویس: حامد محمودی</string>
+    <string name="condition_sunny">آفتابی</string>
+    <string name="condition_clear">صاف</string>
+    <string name="condition_partly_cloudy">نیمه‌ابری</string>
+    <string name="condition_cloudy">ابری</string>
+    <string name="condition_overcast">تمام‌ابری</string>
+    <string name="condition_mist">مه رقیق</string>
+    <string name="condition_patchy_rain">باران پراکنده</string>
+    <string name="condition_rain">بارانی</string>
+    <string name="condition_snow">برفی</string>
+    <string name="condition_thunderstorm">رعد و برق</string>
+    <string name="condition_fog">مه غلیظ</string>
+    <string name="condition_drizzle">باران نم‌نم</string>
 </resources>

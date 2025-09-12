@@ -1,7 +1,6 @@
 package ir.hamedmahmoodi.weathervision.data.repository
 
 import com.google.gson.JsonSyntaxException
-import ir.hamedmahmoodi.weathervision.R
 import ir.hamedmahmoodi.weathervision.data.model.SearchCityResponse
 import ir.hamedmahmoodi.weathervision.data.model.toWeather
 import ir.hamedmahmoodi.weathervision.data.network.WeatherApi

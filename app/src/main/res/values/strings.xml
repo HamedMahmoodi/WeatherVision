@@ -37,4 +37,17 @@
     <string name="type_gregorian">Gregorian</string>
     <string name="type_jalali">Jalali</string>
     <string name="text_loading">Loading weather data....</string>
+    <string name="name_programmer">Programmer: Hamed Mahmoodi</string>
+    <string name="condition_sunny">Sunny</string>
+    <string name="condition_clear">Clear</string>
+    <string name="condition_partly_cloudy">Partly Cloudy</string>
+    <string name="condition_cloudy">Cloudy</string>
+    <string name="condition_overcast">Overcast</string>
+    <string name="condition_mist">Mist</string>
+    <string name="condition_patchy_rain">Patchy Rain</string>
+    <string name="condition_rain">Rain</string>
+    <string name="condition_snow">Snow</string>
+    <string name="condition_thunderstorm">Thunderstorm</string>
+    <string name="condition_fog">Fog</string>
+    <string name="condition_drizzle">Drizzle</string>
 </resources>

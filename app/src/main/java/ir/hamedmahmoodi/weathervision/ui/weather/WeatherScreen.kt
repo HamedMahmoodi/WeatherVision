@@ -107,6 +107,7 @@ import ir.hamedmahmoodi.weathervision.utils.DateUtil.formatDate
 import ir.hamedmahmoodi.weathervision.utils.DateUtil.formatDay
 import ir.hamedmahmoodi.weathervision.utils.DateUtil.formatFullDate
 import ir.hamedmahmoodi.weathervision.utils.TemperatureUnitUtil
+import ir.hamedmahmoodi.weathervision.utils.WeatherConditionMapper
 import kotlinx.coroutines.launch
 import java.util.Locale
 import kotlin.random.Random
@@ -323,14 +324,13 @@ private fun WeatherSuccessState(
                     .fillMaxSize()
                     .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
             ) {
                 AsyncImage(
                     modifier = Modifier.size(120.dp),
                     model = stringResource(
                         R.string.icon_image_url,
-                        uiState.weather?.condition?.icon.orEmpty(),
-                    ),
-
+                        uiState.weather?.condition?.icon.orEmpty()),
                     contentDescription = null,
                     error = painterResource(R.drawable.ic_placeholder),
                     placeholder = painterResource(R.drawable.ic_placeholder),
@@ -357,7 +357,10 @@ private fun WeatherSuccessState(
                 )
                 Text(
                     modifier = Modifier.padding(start = 16.dp),
-                    text = uiState.weather?.condition?.text.orEmpty(),
+                    text = WeatherConditionMapper.map(
+                        uiState.weather?.condition ?.text.orEmpty(),
+                        LocalContext.current
+                    ),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -868,7 +871,20 @@ fun WeatherDrawerContent(
                         labelRes = { stringResource(it.labelRes) }
                     )
 
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 20.dp, start = 16.dp, end = 16.dp),
+                        contentAlignment = Alignment.BottomCenter,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.name_programmer),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+
                 }
+
             }
 
         }
