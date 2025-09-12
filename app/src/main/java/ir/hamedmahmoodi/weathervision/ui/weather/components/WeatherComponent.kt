@@ -47,7 +47,7 @@ fun WeatherComponent(
             verticalArrangement = Arrangement.Center,
         ) {
             Image(
-                modifier = Modifier.size(40.dp),
+                modifier = Modifier.size(35.dp),
                 painter = painterResource(iconId),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,

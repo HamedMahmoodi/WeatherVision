@@ -411,21 +411,21 @@ private fun WeatherSuccessState(
                             TemperatureUnit.CELSIUS -> stringResource(R.string.unit_celsius)
                             TemperatureUnit.FAHRENHEIT -> stringResource(R.string.unit_fahrenheit)
                         },
-                        iconId = R.drawable.ic_wind,
+                        iconId = R.drawable.ic_feels_like,
                     )
                     WeatherComponent(
                         modifier = Modifier.weight(1f),
                         weatherLabel = stringResource(R.string.visibility_label),
                         weatherValue = uiState.weather?.visibility.toString(),
                         weatherUnit = stringResource(R.string.visibility_unit),
-                        iconId = R.drawable.ic_wind,
+                        iconId = R.drawable.ic_visibility,
                     )
                     WeatherComponent(
                         modifier = Modifier.weight(1f),
                         weatherLabel = stringResource(R.string.pressure_label),
                         weatherValue = uiState.weather?.pressure.toString(),
                         weatherUnit = stringResource(R.string.pressure_unit),
-                        iconId = R.drawable.ic_wind,
+                        iconId = R.drawable.ic_pressure,
                     )
                 }
 
